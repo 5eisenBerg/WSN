@@ -1,4 +1,4 @@
-#include "ns3/core-module.hh"
+#include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/lr-wpan-module.h"
 #include "ns3/mobility-module.h"
@@ -11,224 +11,171 @@
 #include <cmath>
 
 using namespace ns3;
-NS_LOG_COMPONENT_DEFINE ("WSN_DQN_Module1");
+NS_LOG_COMPONENT_DEFINE("WSN_DQN_Module1_Fixed");
 
 // --- Constants based on published models ---
 #define NUM_NODES 100
 #define NUM_SINKS 3
 #define SENSOR_NODES (NUM_NODES - NUM_SINKS)
-
-// --- State and Action for Module 1 ---
-// State: [NormalQ_Len, HighPriorityQ_Len, CH_Energy, Packet_Age, Sensed_Delta]
 #define STATE_SIZE 5
-// Action: 0:Send_HP, 1:Send_Normal, 2:Drop_Normal, 3:Wait
 #define ACTION_SIZE 4
 
 // --- First-Order Radio Model Parameters (from Heinzelman et al.) ---
-const double E_ELEC = 50e-9;      // 50 nJ/bit
-const double E_FS = 10e-12;       // 10 pJ/bit/m^2
-const double E_MP = 0.0013e-12;   // 0.0013 pJ/bit/m^4
-const double E_DA = 5e-9;         // 5 nJ/bit/signal (Data Aggregation)
+const double E_ELEC = 50e-9;
+const double E_FS = 10e-12;
+const double E_MP = 0.0013e-12;
 const double D0 = sqrt(E_FS / E_MP);
-const double PACKET_BITS = 100 * 8; // 100-byte packet
+const double PACKET_BITS = 100 * 8;
 
+// --- Data Structures for Node State ---
 struct QueueState {
     double normalPriorityLen = 0;
     double highPriorityLen = 0;
-    double packetAge = 0.0; // Age of the oldest packet in the normal queue
+    double packetAge = 0.0;
 };
-
 struct SensorState {
     double currentValue = 50.0;
-    double previousValue = 50.0;
     double dynamicThreshold = 80.0;
     double ewma_mu = 50.0;
     double ewma_sigma_sq = 10.0;
-    double ewma_gamma = 0.1; // Smoothing factor
 };
-
 struct NodeEnergy {
-    double residualEnergy = 1.0; // Start with 1 Joule
+    double residualEnergy = 1.0;
 };
-
 struct WSNNode {
     QueueState queue;
     SensorState sensor;
     NodeEnergy energy;
     bool isCH = false;
-    uint32_t clusterId = 0;
 };
 
 static WSNNode g_nodesState[NUM_NODES];
 static uint32_t g_currentCH = 0;
+static uint32_t g_taskNode = 0; // NEW: The node whose data is being processed
 static NodeContainer g_allNodes;
-static NetDeviceContainer g_allDevices;
 static Ptr<OpenGymInterface> g_gym;
 
-
-// --- Published Formula Implementation: First-Order Radio Model ---
+// --- Helper Functions ---
 void ConsumeEnergy(uint32_t nodeId, double bits, double distance) {
-    double energyConsumed;
-    if (distance < D0) {
-        energyConsumed = (E_ELEC * bits) + (E_FS * bits * distance * distance);
-    } else {
-        energyConsumed = (E_ELEC * bits) + (E_MP * bits * distance * distance * distance * distance);
+    if (g_nodesState[nodeId].energy.residualEnergy <= 0) return;
+    double energyConsumed = (E_ELEC * bits);
+    if (distance > 0) {
+        energyConsumed += (distance < D0) ? (E_FS * bits * pow(distance, 2))
+                                          : (E_MP * bits * pow(distance, 4));
     }
     g_nodesState[nodeId].energy.residualEnergy -= energyConsumed;
-    if (g_nodesState[nodeId].energy.residualEnergy < 0) {
-        g_nodesState[nodeId].energy.residualEnergy = 0;
-    }
 }
 
-// --- Published Formula Implementation: EWMA Dynamic Threshold ---
-void UpdateDynamicThreshold(uint32_t nodeId) {
+void UpdateDynamicThreshold(uint32_t nodeId, double gamma = 0.1) {
     SensorState& s = g_nodesState[nodeId].sensor;
-    s.ewma_mu = (1 - s.ewma_gamma) * s.ewma_mu + s.ewma_gamma * s.currentValue;
-    s.ewma_sigma_sq = (1 - s.ewma_gamma) * s.ewma_sigma_sq + s.ewma_gamma * pow(s.currentValue - s.ewma_mu, 2);
-    // Threshold is 3 standard deviations above the mean
+    s.ewma_mu = (1 - gamma) * s.ewma_mu + gamma * s.currentValue;
+    s.ewma_sigma_sq = (1 - gamma) * s.ewma_sigma_sq + gamma * pow(s.currentValue - s.ewma_mu, 2);
     s.dynamicThreshold = s.ewma_mu + 3 * sqrt(s.ewma_sigma_sq);
 }
 
-// Simple distance calculation
 double GetDistance(uint32_t nodeA, uint32_t nodeB) {
     Ptr<MobilityModel> mobA = g_allNodes.Get(nodeA)->GetObject<MobilityModel>();
     Ptr<MobilityModel> mobB = g_allNodes.Get(nodeB)->GetObject<MobilityModel>();
     return mobA->GetDistanceFrom(mobB);
 }
 
-// --- Custom Formula (Inspired by LEACH/HEED): Elect a new CH ---
 void ElectClusterHead() {
-    double maxWeight = -1.0;
+    double maxEnergy = -1.0;
     uint32_t newCH = 0;
-
     for (uint32_t i = 0; i < SENSOR_NODES; ++i) {
-        if (g_nodesState[i].energy.residualEnergy > 0) {
-            double energyFactor = g_nodesState[i].energy.residualEnergy / 1.0; // Normalized energy
-            // For simplicity, we omit the V_i/N factor for now to focus on the DQN at the CH
-            double weight = energyFactor; // Simplified for Module 1 focus
-            if (weight > maxWeight) {
-                maxWeight = weight;
-                newCH = i;
-            }
+        if (g_nodesState[i].energy.residualEnergy > maxEnergy) {
+            maxEnergy = g_nodesState[i].energy.residualEnergy;
+            newCH = i;
         }
     }
-    
-    for (uint32_t i=0; i < SENSOR_NODES; ++i) g_nodesState[i].isCH = false;
-    g_nodesState[newCH].isCH = true;
-    g_currentCH = newCH;
-    NS_LOG_INFO("New Cluster Head Elected: Node " << g_currentCH);
+    if (g_currentCH != newCH) {
+         for (uint32_t i=0; i < SENSOR_NODES; ++i) g_nodesState[i].isCH = false;
+         g_nodesState[newCH].isCH = true;
+         g_currentCH = newCH;
+    }
 }
 
 // --- Gym Interface Functions ---
 Ptr<OpenGymSpace> GetObservationSpace() {
-    std::vector<uint32_t> shape = {STATE_SIZE};
-    return CreateObject<OpenGymBoxSpace>(0.0, 1.0, shape, TypeNameGet<double>()); // Normalized space
+    return CreateObject<OpenGymBoxSpace>(0.0, 1.0, std::vector<uint32_t>{STATE_SIZE}, TypeNameGet<double>());
 }
 
 Ptr<OpenGymSpace> GetActionSpace() {
     return CreateObject<OpenGymDiscreteSpace>(ACTION_SIZE);
 }
 
+// *** MAJOR CHANGE HERE ***
+// The environment now simulates one node sensing data and sending it to the CH.
+// The observation is the state of the CH *after* receiving this data.
 Ptr<OpenGymDataContainer> GetObservation() {
-    uint32_t i = g_currentCH;
-    std::vector<uint32_t> shape = {STATE_SIZE};
-    Ptr<OpenGymBoxContainer<double>> box = CreateObject<OpenGymBoxContainer<double>>(shape);
+    // 1. A random sensor node generates data
+    g_taskNode = rand() % SENSOR_NODES;
+    while(g_taskNode == g_currentCH || g_nodesState[g_taskNode].energy.residualEnergy <=0) {
+        g_taskNode = rand() % SENSOR_NODES;
+    }
     
-    // State: [NormalQ_Len, HighPriorityQ_Len, CH_Energy, Packet_Age, Sensed_Delta]
-    box->AddValue(g_nodesState[i].queue.normalPriorityLen / 20.0); // Normalize by max queue size
-    box->AddValue(g_nodesState[i].queue.highPriorityLen / 20.0);
-    box->AddValue(g_nodesState[i].energy.residualEnergy / 1.0);
-    box->AddValue(g_nodesState[i].queue.packetAge / 10.0); // Normalize by max age
+    // 2. Node senses and sends to CH
+    double prevValue = g_nodesState[g_taskNode].sensor.currentValue;
+    g_nodesState[g_taskNode].sensor.currentValue = 20 + (rand() % 70);
+    ConsumeEnergy(g_taskNode, 20, 0); // Sensing energy
+    ConsumeEnergy(g_taskNode, PACKET_BITS, GetDistance(g_taskNode, g_currentCH)); // Tx energy
+    ConsumeEnergy(g_currentCH, PACKET_BITS, 0); // CH Rx energy
     
-    double sensed_delta = abs(g_nodesState[i].sensor.currentValue - g_nodesState[i].sensor.previousValue);
-    box->AddValue(sensed_delta / 50.0); // Normalize by expected max delta
+    // 3. CH classifies the incoming packet and queues it
+    UpdateDynamicThreshold(g_taskNode);
+    if (abs(g_nodesState[g_taskNode].sensor.currentValue - prevValue) > 20) { // Spike
+         g_nodesState[g_currentCH].queue.highPriorityLen++;
+    } else if (g_nodesState[g_taskNode].sensor.currentValue > g_nodesState[g_taskNode].sensor.dynamicThreshold) { // Normal
+        g_nodesState[g_currentCH].queue.normalPriorityLen++;
+    } // Otherwise, data is dropped (redundant)
 
+    // 4. Return the CH's current state to the Python agent for a decision
+    Ptr<OpenGymBoxContainer<double>> box = CreateObject<OpenGymBoxContainer<double>>(std::vector<uint32_t>{STATE_SIZE});
+    box->AddValue(std::min(1.0, g_nodesState[g_currentCH].queue.normalPriorityLen / 20.0));
+    box->AddValue(std::min(1.0, g_nodesState[g_currentCH].queue.highPriorityLen / 20.0));
+    box->AddValue(std::max(0.0, g_nodesState[g_currentCH].energy.residualEnergy / 1.0));
+    box->AddValue(std::min(1.0, g_nodesState[g_currentCH].queue.packetAge / 10.0));
+    box->AddValue(g_nodesState[g_currentCH].queue.highPriorityLen > 0 ? 1.0 : 0.0); // Is there a critical packet?
+    
     return box;
 }
 
-float GetReward() { return 0.0; } // Reward is calculated entirely on the Python side
-bool GetGameOver() { return g_nodesState[g_currentCH].energy.residualEnergy <= 0; }
+float GetReward() { return 0.0; }
+bool GetGameOver() { return g_nodesState[g_currentCH].energy.residualEnergy <= 0.05; } // End if CH energy is critical
 std::string GetExtraInfo() { return ""; }
 
 bool ExecuteActions(Ptr<OpenGymDataContainer> action) {
     uint32_t ch_id = g_currentCH;
     uint32_t a = DynamicCast<OpenGymDiscreteContainer>(action)->GetValue();
-
     QueueState& q = g_nodesState[ch_id].queue;
 
     switch (a) {
-        case 0: // Send High Priority Packet
-            if (q.highPriorityLen > 0) {
-                q.highPriorityLen--;
-                ConsumeEnergy(ch_id, PACKET_BITS, 50.0); // Assume 50m to sink
-            }
-            break;
-        case 1: // Send Normal Priority Packet
-            if (q.normalPriorityLen > 0) {
-                q.normalPriorityLen--;
-                ConsumeEnergy(ch_id, PACKET_BITS, 50.0);
-                q.packetAge = 0; // Reset age
-            }
-            break;
-        case 2: // Drop Normal Priority Packet
-            if (q.normalPriorityLen > 0) {
-                q.normalPriorityLen--;
-                q.packetAge = 0;
-            }
-            break;
+        case 0: // Send High Priority
+            if (q.highPriorityLen > 0) { q.highPriorityLen--; ConsumeEnergy(ch_id, PACKET_BITS, 70.0); } break;
+        case 1: // Send Normal
+            if (q.normalPriorityLen > 0) { q.normalPriorityLen--; q.packetAge = 0; ConsumeEnergy(ch_id, PACKET_BITS, 70.0); } break;
+        case 2: // Drop Normal
+            if (q.normalPriorityLen > 0) { q.normalPriorityLen--; q.packetAge = 0; } break;
         case 3: // Wait
-            // Conserve energy, do nothing.
-            break;
-    }
-    
-    // --- Environment Dynamics Update ---
-    // 1. All sensor nodes sense data and send to CH
-    for (uint32_t i = 0; i < SENSOR_NODES; ++i) {
-        if (i == ch_id || g_nodesState[i].energy.residualEnergy <= 0) continue;
-        
-        g_nodesState[i].sensor.previousValue = g_nodesState[i].sensor.currentValue;
-        g_nodesState[i].sensor.currentValue = 20 + (rand() % 70); // Simulate sensing
-        ConsumeEnergy(i, 20, 0); // Energy for sensing
-        
-        // Send data to CH
-        double dist = GetDistance(i, ch_id);
-        ConsumeEnergy(i, PACKET_BITS, dist);
-        
-        // CH receives data
-        ConsumeEnergy(ch_id, PACKET_BITS, 0); // Energy for reception
-        
-        // --- CH Data Filtering Logic ---
-        UpdateDynamicThreshold(i);
-        // High Priority: sudden spike in data
-        if (abs(g_nodesState[i].sensor.currentValue - g_nodesState[i].sensor.previousValue) > 15) {
-             g_nodesState[ch_id].queue.highPriorityLen++;
-        }
-        // Normal Priority: data is above the dynamic baseline
-        else if (g_nodesState[i].sensor.currentValue > g_nodesState[i].sensor.dynamicThreshold) {
-            g_nodesState[ch_id].queue.normalPriorityLen++;
-        }
-        // Else: data is redundant and is dropped (no queueing)
+             ConsumeEnergy(ch_id, 1, 0); break; // Small energy cost for being idle
     }
 
-    // 2. Update packet age in normal queue
-    if (g_nodesState[ch_id].queue.normalPriorityLen > 0) {
-        g_nodesState[ch_id].queue.packetAge += 0.1;
-    } else {
-        g_nodesState[ch_id].queue.packetAge = 0.0;
-    }
+    // Update packet age
+    if (g_nodesState[ch_id].queue.normalPriorityLen > 0) g_nodesState[ch_id].queue.packetAge += 0.2;
+    else g_nodesState[ch_id].queue.packetAge = 0.0;
     
     return true;
 }
 
 void ScheduleNextStep(uint32_t interval, uint32_t& roundCounter) {
-    if (roundCounter % 20 == 0) { // Re-elect CH every 20 rounds
-        ElectClusterHead();
-    }
+    if (g_gym->IsGameOver()) return;
+    if (roundCounter > 0 && roundCounter % 20 == 0) { ElectClusterHead(); }
     roundCounter++;
     g_gym->NotifyCurrentState();
     Simulator::Schedule(MilliSeconds(interval), &ScheduleNextStep, interval, roundCounter);
 }
 
+// Main function remains largely the same...
 int main(int argc, char* argv[]) {
     uint32_t openGymPort = 5555;
     CommandLine cmd;
@@ -242,13 +189,13 @@ int main(int argc, char* argv[]) {
     pos.SetTypeId("ns3::RandomRectanglePositionAllocator");
     pos.Set("X", StringValue("ns3::UniformRandomVariable[Min=0.0|Max=100.0]"));
     pos.Set("Y", StringValue("ns3::UniformRandomVariable[Min=0.0|Max=100.0]"));
-    Ptr<PositionAllocator> taPositionAlloc = pos.Create()->GetObject<PositionAllocator>();
-    mobility.SetPositionAllocator(taPositionAlloc);
+    mobility.SetPositionAllocator(pos.Create()->GetObject<PositionAllocator>());
     mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
     mobility.Install(g_allNodes);
     
-    LrWpanHelper lrWpanHelper;
-    g_allDevices = lrWpanHelper.Install(g_allNodes);
+    for(int i = 0; i < NUM_NODES; ++i) g_nodesState[i] = WSNNode(); // Reset states
+
+    ElectClusterHead();
     
     g_gym = CreateObject<OpenGymInterface>(openGymPort);
     g_gym->SetGetObservationSpaceCb(MakeCallback(&GetObservationSpace));
@@ -256,14 +203,11 @@ int main(int argc, char* argv[]) {
     g_gym->SetGetObservationCb(MakeCallback(&GetObservation));
     g_gym->SetGetRewardCb(MakeCallback(&GetReward));
     g_gym->SetGetGameOverCb(MakeCallback(&GetGameOver));
-    g_gym->SetGetExtraInfoCb(MakeCallback(&GetExtraInfo));
     g_gym->SetExecuteActionsCb(MakeCallback(&ExecuteActions));
-    
-    ElectClusterHead(); // Initial election
     
     uint32_t roundCounter = 0;
     Simulator::Schedule(MilliSeconds(100), &ScheduleNextStep, 100, roundCounter);
-    Simulator::Stop(Seconds(60.0));
+    Simulator::Stop(Seconds(25.0)); // Episodes are shorter now
     Simulator::Run();
     g_gym->NotifySimulationEnd();
     Simulator::Destroy();
