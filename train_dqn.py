@@ -141,31 +141,42 @@ def main():
 
     for ep in range(1, EPISODES + 1):
         # Launch NS-3 simulation for each episode
+        # Use Popen to run it in the background
         ns3_process = subprocess.Popen(
             f"./ns3 run '{SIM_SCRIPT} --openGymPort={PORT}'",
             cwd=NS3_PATH, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
         )
-        time.sleep(3) # Give time for NS-3 to start
+        # Give NS-3 a moment to start and listen on the port
+        time.sleep(3) 
 
         try:
             env = ns3env.Ns3Env(port=PORT, startSim=False)
             
-            state, _ = env.reset()
+            # --- FIX STARTS HERE ---
+            # The reset() function in this version of ns3gym returns only the state.
+            state = env.reset()
+            # --- FIX ENDS HERE ---
+
             state = np.array(state, dtype=np.float32)
             total_reward = 0
             
             for step in range(STEPS_PER_EPISODE):
                 prev_state = state
                 action = agent.act(state)
-                next_state, _, terminated, truncated, _ = env.step(action)
-                done = terminated or truncated
+
+                # --- FIX STARTS HERE ---
+                # The step() function in ns3gym returns 4 values, not 5.
+                next_state, reward_from_env, terminated, info = env.step(action)
+                done = terminated 
+                # --- FIX ENDS HERE ---
                 
                 next_state = np.array(next_state, dtype=np.float32)
                 
-                reward = calculate_reward(next_state, prev_state)
-                total_reward += reward
+                # Use our custom reward function
+                shaped_reward = calculate_reward(next_state, prev_state)
+                total_reward += shaped_reward
 
-                agent.memory.push(state, action, reward, next_state, done)
+                agent.memory.push(state, action, shaped_reward, next_state, done)
                 agent.train()
                 
                 state = next_state
@@ -176,9 +187,9 @@ def main():
             episode_rewards.append(total_reward)
             agent.update_epsilon()
             
-            avg_reward = np.mean(episode_rewards)
+            avg_reward = np.mean(episode_rewards) if episode_rewards else -np.inf
             
-            if avg_reward > best_reward:
+            if avg_reward > best_reward and len(episode_rewards) > 10:
                 torch.save(agent.model.state_dict(), 'module1_best.pth')
                 best_reward = avg_reward
                 print(f"🏆 Ep {ep:3d} | Total Reward: {total_reward:6.1f} | Avg Reward: {avg_reward:6.1f} | Epsilon: {agent.epsilon:.3f} | NEW BEST!")
@@ -188,13 +199,18 @@ def main():
         except Exception as e:
             print(f"An error occurred: {e}")
         finally:
-            env.close()
+            # Ensure all processes are properly cleaned up
+            try:
+                env.close()
+            except:
+                pass
             ns3_process.kill()
-            # Ensure the process is gone
+            # A final check to kill any lingering processes
             subprocess.run(f"pkill -9 -f {SIM_SCRIPT}", shell=True, check=False)
             time.sleep(1)
             
     print("\n🎯 Module 1 Training Finished. Best model saved to 'module1_best.pth'")
+
 
 if __name__ == '__main__':
     main()
