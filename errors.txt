@@ -1,13 +1,29 @@
-rl-venv) heisenberg@heisenberg:~/ns3-workspace/bake/source/ns-3.40$ ./ns3 build
-[0/2] Re-checking globbed directories...
-[1/2] Building CXX object scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o
-FAILED: scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o 
-/usr/bin/c++ -DEIGEN_MPL2_ONLY -DHAVE_BOOST -DHAVE_BOOST_UNITS -DHAVE_EIGEN3 -DHAVE_GSL -DHAVE_LIBXML2 -DHAVE_PACKET_H -DHAVE_SQLITE3 -DNS3_ASSERT_ENABLE -DNS3_BUILD_PROFILE_DEBUG -DNS3_LOG_ENABLE -DPROJECT_SOURCE_PATH=\"/home/heisenberg/ns3-workspace/bake/source/ns-3.40\" -DRAW_SOCK_CREATOR=\"/home/heisenberg/ns3-workspace/bake/source/ns-3.40/build/src/fd-net-device/ns3.40-raw-sock-creator-default\" -DTAP_DEV_CREATOR=\"/home/heisenberg/ns3-workspace/bake/source/ns-3.40/build/src/fd-net-device/ns3.40-tap-device-creator-default\" -D__LINUX__ -I/home/heisenberg/ns3-workspace/bake/source/ns-3.40/build/include -I/usr -I/usr/include/eigen3 -I/usr/include/freetype2 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gtk-3.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/atk-1.0 -I/usr/include/libxml2 -O2 -g -DNDEBUG -std=c++17 -fPIE   -fno-semantic-interposition -fdiagnostics-color=always -Wall -Winvalid-pch -include /home/heisenberg/ns3-workspace/bake/source/ns-3.40/cmake-cache/CMakeFiles/stdlib_pch_exec.dir/cmake_pch.hxx -MD -MT scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o -MF scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o.d -o scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o -c /home/heisenberg/ns3-workspace/bake/source/ns-3.40/scratch/wsn_100dynamic.cc
-/home/heisenberg/ns3-workspace/bake/source/ns-3.40/scratch/wsn_100dynamic.cc:1:10: fatal error: ns3/core-module.hh: No such file or directory
-    1 | #include "ns3/core-module.hh"
-      |          ^~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-ninja: build stopped: subcommand failed.
-Finished executing the following commands:
-cd cmake-cache; /usr/bin/cmake --build . -j 7 ; cd ..
-(rl-venv) heisenberg@heisenberg:~/ns3-workspace/bake/source/ns-3.40$ 
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ python3 train_dqn.py
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+🚀 Initializing WSN Environment for Module 1: Edge-DQN & Dual-Queue Filtering
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+An error occurred: too many values to unpack (expected 2)
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+An error occurred: too many values to unpack (expected 2)
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+An error occurred: too many values to unpack (expected 2)
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+An error occurred: too many values to unpack (expected 2)
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+An error occurred: too many values to unpack (expected 2)
+^CTraceback (most recent call last):
+  File "/home/heisenberg/ns3-workspace/rl-agent/training/train_dqn.py", line 200, in <module>
+    main()
+  File "/home/heisenberg/ns3-workspace/rl-agent/training/train_dqn.py", line 148, in main
+    time.sleep(3) # Give time for NS-3 to start
+KeyboardInterrupt
+
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
