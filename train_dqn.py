@@ -101,35 +101,55 @@ class DQNAgent:
     def update_epsilon(self):
         self.epsilon = max(EPS_END, self.epsilon * EPS_DECAY)
 
-def calculate_reward(state, prev_state):
+def calculate_reward(state, prev_state, action):
     """
-    Calculates reward based on the change in state, focusing on Module 1 objectives.
-    State: [NormalQ_Len, HighPriorityQ_Len, CH_Energy, Packet_Age, Sensed_Delta]
+    Calculates reward based on the change in state for Module 1.
+    State: [NormalQ_Len, HighPriorityQ_Len, CH_Energy, Packet_Age, Critical_Flag]
+    Action: 0:Send_HP, 1:Send_Normal, 2:Drop_Normal, 3:Wait
     """
     reward = 0.0
     
-    # Heavily reward sending a high-priority packet
-    if state[1] < prev_state[1]: # HP Queue Length decreased
-        reward += 20.0
-        
-    # Reward sending a normal packet
-    if state[0] < prev_state[0]: # Normal Queue Length decreased
-        reward += 5.0
+    # --- Action-based Rewards/Penalties ---
+    # Good: Agent chose to send an existing HP packet
+    if action == 0 and prev_state[1] > 0:
+        reward += 25.0
+    # Bad: Agent tried to send an HP packet that wasn't there
+    elif action == 0 and prev_state[1] == 0:
+        reward -= 15.0
 
-    # Penalize stale packets in the normal queue
-    # The penalty increases exponentially with age
-    if state[3] > 0.5: # Packet_Age > 5 seconds (normalized)
-        reward -= 2.0 * np.exp(state[3] - 0.5)
+    # Good: Agent sent a normal packet
+    if action == 1 and prev_state[0] > 0:
+        reward += 5.0
+        
+    # Bad: Agent dropped a normal packet (sometimes necessary, but should be discouraged)
+    if action == 2:
+        reward -= 2.0
+
+    # Bad: Agent waited when there was a critical packet to send
+    if action == 3 and prev_state[1] > 0:
+        reward -= 20.0
+
+    # --- State-based Penalties ---
+    # Penalize stale packets in the normal queue, grows with age
+    if state[3] > 0.5:  # Packet_Age > 50% of timeout
+        reward -= 5.0 * state[3]
 
     # Penalize high congestion in the normal queue
-    if state[0] > 0.8: # Normal Queue > 80% full
+    if state[0] > 0.8:  # Normal Queue > 80% full
         reward -= 10.0
-
-    # Small penalty for energy consumption to encourage efficiency
+        
+    # Small penalty for energy consumption to promote efficiency
     energy_consumed = prev_state[2] - state[2]
-    reward -= energy_consumed * 5.0
+    if energy_consumed > 0:
+        reward -= energy_consumed * 10.0
 
     return reward
+
+# In your main() function, update the line where the reward is calculated:
+# OLD: shaped_reward = calculate_reward(next_state, prev_state)
+# NEW:
+shaped_reward = calculate_reward(next_state, prev_state, action)
+
 
 # --- Main Execution Logic ---
 def main():
