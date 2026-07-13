@@ -1,0 +1,25 @@
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ python3 train_dqn.py
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+🚀 Initializing WSN Environment for Module 1: Edge-DQN & Dual-Queue Filtering
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep   1 | Total Reward:  200.0 | Avg Reward:  200.0 | Epsilon: 0.995
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep   2 | Total Reward:  200.0 | Avg Reward:  200.0 | Epsilon: 0.990
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep   3 | Total Reward:  200.0 | Avg Reward:  200.0 | Epsilon: 0.985
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep   4 | Total Reward:  200.0 | Avg Reward:  200.0 | Epsilon: 0.980
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep   5 | Total Reward:  200.0 | Avg Reward:  200.0 | Epsilon: 0.975
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep   6 | Total Reward:  200.0 | Avg Reward:  200.0 | Epsilon: 0.970
+Waiting for simulation script to connect on port: tcp://localhost:5555
