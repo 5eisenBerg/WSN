@@ -1015,3 +1015,1026 @@ Please start proper ns-3 simulation script using ./waf --run "..."
 🎯 Module 1 Training Finished. Best model saved to 'module1_best.pth'
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
+
+
+
+
+
+
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 163 | Reward:  2274.7 | Avg Reward:  1906.1 | Epsilon: 0.442 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 164 | Reward:  2575.7 | Avg Reward:  1915.8 | Epsilon: 0.440 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 165 | Reward:  2159.7 | Avg Reward:  1923.9 | Epsilon: 0.437 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 166 | Reward:  2417.7 | Avg Reward:  1937.2 | Epsilon: 0.435 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 167 | Reward:  2458.7 | Avg Reward:  1944.6 | Epsilon: 0.433 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 168 | Reward:  2607.7 | Avg Reward:  1958.5 | Epsilon: 0.431 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 169 | Reward:  2303.7 | Avg Reward:  1967.8 | Epsilon: 0.429 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 170 | Reward:  2555.7 | Avg Reward:  1981.4 | Epsilon: 0.427 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 171 | Reward:  2281.7 | Avg Reward:  1989.2 | Epsilon: 0.424 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 172 | Reward:  2325.7 | Avg Reward:  1999.7 | Epsilon: 0.422 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 173 | Reward:  2505.7 | Avg Reward:  2010.0 | Epsilon: 0.420 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 174 | Reward:  2548.7 | Avg Reward:  2020.5 | Epsilon: 0.418 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 175 | Reward:  2104.7 | Avg Reward:  2025.8 | Epsilon: 0.416 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 176 | Reward:  2432.7 | Avg Reward:  2035.2 | Epsilon: 0.414 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 177 | Reward:  2457.7 | Avg Reward:  2045.0 | Epsilon: 0.412 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 178 | Reward:  2527.7 | Avg Reward:  2056.6 | Epsilon: 0.410 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 179 | Reward:  2479.7 | Avg Reward:  2062.7 | Epsilon: 0.408 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 180 | Reward:  2652.7 | Avg Reward:  2071.4 | Epsilon: 0.406 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 181 | Reward:  2712.7 | Avg Reward:  2081.2 | Epsilon: 0.404 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 182 | Reward:  2396.7 | Avg Reward:  2084.3 | Epsilon: 0.402 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 183 | Reward:  2627.7 | Avg Reward:  2091.5 | Epsilon: 0.400 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 184 | Reward:  2454.7 | Avg Reward:  2099.2 | Epsilon: 0.398 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 185 | Reward:  2530.7 | Avg Reward:  2107.3 | Epsilon: 0.396 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 186 | Reward:  2514.7 | Avg Reward:  2117.1 | Epsilon: 0.394 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 187 | Reward:  2748.7 | Avg Reward:  2132.1 | Epsilon: 0.392 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 188 | Reward:  2273.7 | Avg Reward:  2138.9 | Epsilon: 0.390 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 189 | Reward:  2562.7 | Avg Reward:  2144.9 | Epsilon: 0.388 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 190 | Reward:  2190.7 | Avg Reward:  2148.9 | Epsilon: 0.386 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 191 | Reward:  2541.7 | Avg Reward:  2157.8 | Epsilon: 0.384 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 192 | Reward:  2443.7 | Avg Reward:  2164.1 | Epsilon: 0.382 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 193 | Reward:  2535.7 | Avg Reward:  2170.3 | Epsilon: 0.380 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 194 | Reward:  2616.7 | Avg Reward:  2183.0 | Epsilon: 0.378 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 195 | Reward:  2583.7 | Avg Reward:  2188.0 | Epsilon: 0.376 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 196 | Reward:  2558.7 | Avg Reward:  2194.2 | Epsilon: 0.374 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 197 | Reward:  2488.7 | Avg Reward:  2201.4 | Epsilon: 0.373 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 198 | Reward:  2461.7 | Avg Reward:  2209.7 | Epsilon: 0.371 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 199 | Reward:  2389.7 | Avg Reward:  2217.7 | Epsilon: 0.369 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 200 | Reward:  2423.7 | Avg Reward:  2225.5 | Epsilon: 0.367 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 201 | Reward:  2442.7 | Avg Reward:  2238.1 | Epsilon: 0.365 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 202 | Reward:  2162.7 | Avg Reward:  2239.4 | Epsilon: 0.363 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 203 | Reward:  2442.7 | Avg Reward:  2248.7 | Epsilon: 0.361 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 204 | Reward:  2484.7 | Avg Reward:  2257.7 | Epsilon: 0.360 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 205 | Reward:  2412.7 | Avg Reward:  2265.4 | Epsilon: 0.358 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 206 | Reward:  2555.7 | Avg Reward:  2273.6 | Epsilon: 0.356 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 207 | Reward:  2669.7 | Avg Reward:  2283.1 | Epsilon: 0.354 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 208 | Reward:  2542.7 | Avg Reward:  2290.9 | Epsilon: 0.353 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 209 | Reward:  2770.7 | Avg Reward:  2301.9 | Epsilon: 0.351 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 210 | Reward:  2436.7 | Avg Reward:  2307.7 | Epsilon: 0.349 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 211 | Reward:  2656.7 | Avg Reward:  2318.0 | Epsilon: 0.347 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 212 | Reward:  2821.7 | Avg Reward:  2330.8 | Epsilon: 0.346 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 213 | Reward:  2824.7 | Avg Reward:  2342.6 | Epsilon: 0.344 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 214 | Reward:  2509.7 | Avg Reward:  2349.0 | Epsilon: 0.342 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 215 | Reward:  2497.7 | Avg Reward:  2357.4 | Epsilon: 0.340 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 216 | Reward:  2580.7 | Avg Reward:  2364.5 | Epsilon: 0.339 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 217 | Reward:  2620.7 | Avg Reward:  2372.1 | Epsilon: 0.337 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 218 | Reward:  2652.7 | Avg Reward:  2377.7 | Epsilon: 0.335 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 219 | Reward:  2452.7 | Avg Reward:  2383.9 | Epsilon: 0.334 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 220 | Reward:  2400.7 | Avg Reward:  2384.1 | Epsilon: 0.332 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 221 | Reward:  2578.7 | Avg Reward:  2391.1 | Epsilon: 0.330 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 222 | Reward:  2836.7 | Avg Reward:  2396.4 | Epsilon: 0.329 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 223 | Reward:  2517.7 | Avg Reward:  2398.1 | Epsilon: 0.327 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 224 | Reward:  2721.7 | Avg Reward:  2405.2 | Epsilon: 0.325 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 225 | Reward:  2772.7 | Avg Reward:  2412.6 | Epsilon: 0.324 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 226 | Reward:  2695.7 | Avg Reward:  2418.1 | Epsilon: 0.322 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 227 | Reward:  2733.7 | Avg Reward:  2429.5 | Epsilon: 0.321 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 228 | Reward:  2776.7 | Avg Reward:  2440.2 | Epsilon: 0.319 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 229 | Reward:  2605.7 | Avg Reward:  2445.5 | Epsilon: 0.317 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 230 | Reward:  2502.7 | Avg Reward:  2448.4 | Epsilon: 0.316 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 231 | Reward:  2481.7 | Avg Reward:  2451.2 | Epsilon: 0.314 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 232 | Reward:  2584.7 | Avg Reward:  2456.1 | Epsilon: 0.313 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 233 | Reward:  2432.7 | Avg Reward:  2460.3 | Epsilon: 0.311 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 234 | Reward:  2562.7 | Avg Reward:  2461.1 | Epsilon: 0.309 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 235 | Reward:  2587.7 | Avg Reward:  2464.1 | Epsilon: 0.308 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 236 | Reward:  2620.7 | Avg Reward:  2468.1 | Epsilon: 0.306 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 237 | Reward:  2546.7 | Avg Reward:  2473.6 | Epsilon: 0.305 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 238 | Reward:  2647.7 | Avg Reward:  2476.8 | Epsilon: 0.303 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 239 | Reward:  2774.7 | Avg Reward:  2483.3 | Epsilon: 0.302 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 240 | Reward:  2591.7 | Avg Reward:  2485.7 | Epsilon: 0.300 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 241 | Reward:  2456.7 | Avg Reward:  2486.3 | Epsilon: 0.299 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 242 | Reward:  2613.7 | Avg Reward:  2489.4 | Epsilon: 0.297 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 243 | Reward:  2771.7 | Avg Reward:  2493.2 | Epsilon: 0.296 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 244 | Reward:  2802.7 | Avg Reward:  2497.4 | Epsilon: 0.294 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 245 | Reward:  2618.7 | Avg Reward:  2502.8 | Epsilon: 0.293 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 246 | Reward:  2619.7 | Avg Reward:  2503.2 | Epsilon: 0.291 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 247 | Reward:  2581.7 | Avg Reward:  2507.8 | Epsilon: 0.290 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 248 | Reward:  2714.7 | Avg Reward:  2511.2 | Epsilon: 0.288 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 249 | Reward:  2806.7 | Avg Reward:  2517.4 | Epsilon: 0.287 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 250 | Reward:  2652.7 | Avg Reward:  2520.2 | Epsilon: 0.286 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 251 | Reward:  2759.7 | Avg Reward:  2524.7 | Epsilon: 0.284 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 252 | Reward:  2798.7 | Avg Reward:  2529.6 | Epsilon: 0.283 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 253 | Reward:  2765.7 | Avg Reward:  2532.9 | Epsilon: 0.281 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 254 | Reward:  2379.7 | Avg Reward:  2532.4 | Epsilon: 0.280
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 255 | Reward:  2797.7 | Avg Reward:  2534.1 | Epsilon: 0.279 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 256 | Reward:  2816.7 | Avg Reward:  2537.5 | Epsilon: 0.277 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 257 | Reward:  2935.7 | Avg Reward:  2544.0 | Epsilon: 0.276 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 258 | Reward:  2654.7 | Avg Reward:  2549.5 | Epsilon: 0.274 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 259 | Reward:  2618.7 | Avg Reward:  2551.9 | Epsilon: 0.273 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 260 | Reward:  2737.7 | Avg Reward:  2559.1 | Epsilon: 0.272 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 261 | Reward:  2529.7 | Avg Reward:  2561.1 | Epsilon: 0.270 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 262 | Reward:  2533.7 | Avg Reward:  2562.0 | Epsilon: 0.269 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 263 | Reward:  2858.7 | Avg Reward:  2567.9 | Epsilon: 0.268 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 264 | Reward:  2817.7 | Avg Reward:  2570.3 | Epsilon: 0.266 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 265 | Reward:  2942.7 | Avg Reward:  2578.1 | Epsilon: 0.265 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 266 | Reward:  2696.7 | Avg Reward:  2580.9 | Epsilon: 0.264 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 267 | Reward:  2822.7 | Avg Reward:  2584.6 | Epsilon: 0.262 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 268 | Reward:  2760.7 | Avg Reward:  2586.1 | Epsilon: 0.261 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 269 | Reward:  2817.7 | Avg Reward:  2591.2 | Epsilon: 0.260 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 270 | Reward:  2639.7 | Avg Reward:  2592.1 | Epsilon: 0.258 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 271 | Reward:  2878.7 | Avg Reward:  2598.0 | Epsilon: 0.257 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 272 | Reward:  2819.7 | Avg Reward:  2603.0 | Epsilon: 0.256 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 273 | Reward:  2674.7 | Avg Reward:  2604.7 | Epsilon: 0.255 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 274 | Reward:  2746.7 | Avg Reward:  2606.6 | Epsilon: 0.253 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 275 | Reward:  2836.7 | Avg Reward:  2614.0 | Epsilon: 0.252 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 276 | Reward:  2825.7 | Avg Reward:  2617.9 | Epsilon: 0.251 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 277 | Reward:  2807.7 | Avg Reward:  2621.4 | Epsilon: 0.249 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 278 | Reward:  2838.7 | Avg Reward:  2624.5 | Epsilon: 0.248 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 279 | Reward:  2831.7 | Avg Reward:  2628.0 | Epsilon: 0.247 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 280 | Reward:  2806.7 | Avg Reward:  2629.6 | Epsilon: 0.246 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 281 | Reward:  2721.7 | Avg Reward:  2629.7 | Epsilon: 0.245 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 282 | Reward:  2954.7 | Avg Reward:  2635.2 | Epsilon: 0.243 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 283 | Reward:  2800.7 | Avg Reward:  2637.0 | Epsilon: 0.242 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 284 | Reward:  2734.7 | Avg Reward:  2639.8 | Epsilon: 0.241 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 285 | Reward:  2911.7 | Avg Reward:  2643.6 | Epsilon: 0.240 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 286 | Reward:  2743.7 | Avg Reward:  2645.9 | Epsilon: 0.238 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 287 | Reward:  2747.7 | Avg Reward:  2645.9 | Epsilon: 0.237
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 288 | Reward:  2827.7 | Avg Reward:  2651.4 | Epsilon: 0.236 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 289 | Reward:  2750.7 | Avg Reward:  2653.3 | Epsilon: 0.235 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 290 | Reward:  2920.7 | Avg Reward:  2660.6 | Epsilon: 0.234 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 291 | Reward:  2751.7 | Avg Reward:  2662.7 | Epsilon: 0.233 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 292 | Reward:  2793.7 | Avg Reward:  2666.2 | Epsilon: 0.231 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 293 | Reward:  2730.7 | Avg Reward:  2668.1 | Epsilon: 0.230 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 294 | Reward:  2759.7 | Avg Reward:  2669.6 | Epsilon: 0.229 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 295 | Reward:  2662.7 | Avg Reward:  2670.3 | Epsilon: 0.228 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 296 | Reward:  2943.7 | Avg Reward:  2674.2 | Epsilon: 0.227 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 297 | Reward:  2883.7 | Avg Reward:  2678.1 | Epsilon: 0.226 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 298 | Reward:  2891.7 | Avg Reward:  2682.4 | Epsilon: 0.225 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 299 | Reward:  2731.7 | Avg Reward:  2685.9 | Epsilon: 0.223 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 300 | Reward:  2875.7 | Avg Reward:  2690.4 | Epsilon: 0.222 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 301 | Reward:  2683.7 | Avg Reward:  2692.8 | Epsilon: 0.221 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 302 | Reward:  2881.7 | Avg Reward:  2700.0 | Epsilon: 0.220 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 303 | Reward:  2782.7 | Avg Reward:  2703.4 | Epsilon: 0.219 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 304 | Reward:  2738.7 | Avg Reward:  2705.9 | Epsilon: 0.218 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 305 | Reward:  2783.7 | Avg Reward:  2709.6 | Epsilon: 0.217 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 306 | Reward:  2647.7 | Avg Reward:  2710.6 | Epsilon: 0.216 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 307 | Reward:  2793.7 | Avg Reward:  2711.8 | Epsilon: 0.215 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 308 | Reward:  2818.7 | Avg Reward:  2714.6 | Epsilon: 0.214 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 309 | Reward:  2745.7 | Avg Reward:  2714.3 | Epsilon: 0.212
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 310 | Reward:  2810.7 | Avg Reward:  2718.0 | Epsilon: 0.211 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 311 | Reward:  2905.7 | Avg Reward:  2720.5 | Epsilon: 0.210 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 312 | Reward:  2761.7 | Avg Reward:  2719.9 | Epsilon: 0.209
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 313 | Reward:  2849.7 | Avg Reward:  2720.2 | Epsilon: 0.208
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 314 | Reward:  2952.7 | Avg Reward:  2724.6 | Epsilon: 0.207 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 315 | Reward:  2795.7 | Avg Reward:  2727.6 | Epsilon: 0.206 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 316 | Reward:  2796.7 | Avg Reward:  2729.8 | Epsilon: 0.205 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 317 | Reward:  2792.7 | Avg Reward:  2731.5 | Epsilon: 0.204 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 318 | Reward:  2794.7 | Avg Reward:  2732.9 | Epsilon: 0.203 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 319 | Reward:  2843.7 | Avg Reward:  2736.8 | Epsilon: 0.202 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 320 | Reward:  2946.7 | Avg Reward:  2742.3 | Epsilon: 0.201 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 321 | Reward:  2919.7 | Avg Reward:  2745.7 | Epsilon: 0.200 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 322 | Reward:  2877.7 | Avg Reward:  2746.1 | Epsilon: 0.199 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 323 | Reward:  2824.7 | Avg Reward:  2749.2 | Epsilon: 0.198 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 324 | Reward:  2699.7 | Avg Reward:  2748.9 | Epsilon: 0.197
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 325 | Reward:  2792.7 | Avg Reward:  2749.1 | Epsilon: 0.196
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 326 | Reward:  2869.7 | Avg Reward:  2750.9 | Epsilon: 0.195 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 327 | Reward:  2853.7 | Avg Reward:  2752.1 | Epsilon: 0.194 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 328 | Reward:  2879.7 | Avg Reward:  2753.1 | Epsilon: 0.193 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 329 | Reward:  2848.7 | Avg Reward:  2755.5 | Epsilon: 0.192 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 330 | Reward:  2946.7 | Avg Reward:  2760.0 | Epsilon: 0.191 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 331 | Reward:  3003.7 | Avg Reward:  2765.2 | Epsilon: 0.190 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 332 | Reward:  2864.7 | Avg Reward:  2768.0 | Epsilon: 0.189 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 333 | Reward:  2945.7 | Avg Reward:  2773.1 | Epsilon: 0.188 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 334 | Reward:  2843.7 | Avg Reward:  2775.9 | Epsilon: 0.187 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 335 | Reward:  2938.7 | Avg Reward:  2779.4 | Epsilon: 0.187 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 336 | Reward:  2843.7 | Avg Reward:  2781.7 | Epsilon: 0.186 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 337 | Reward:  2907.7 | Avg Reward:  2785.3 | Epsilon: 0.185 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 338 | Reward:  2948.7 | Avg Reward:  2788.3 | Epsilon: 0.184 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 339 | Reward:  2838.7 | Avg Reward:  2788.9 | Epsilon: 0.183 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 340 | Reward:  2908.7 | Avg Reward:  2792.1 | Epsilon: 0.182 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 341 | Reward:  2942.7 | Avg Reward:  2797.0 | Epsilon: 0.181 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 342 | Reward:  2805.7 | Avg Reward:  2798.9 | Epsilon: 0.180 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 343 | Reward:  2896.7 | Avg Reward:  2800.1 | Epsilon: 0.179 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 344 | Reward:  2937.7 | Avg Reward:  2801.5 | Epsilon: 0.178 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 345 | Reward:  2886.7 | Avg Reward:  2804.2 | Epsilon: 0.177 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 346 | Reward:  2966.7 | Avg Reward:  2807.6 | Epsilon: 0.177 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 347 | Reward:  2963.7 | Avg Reward:  2811.5 | Epsilon: 0.176 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 348 | Reward:  2970.7 | Avg Reward:  2814.0 | Epsilon: 0.175 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 349 | Reward:  2944.7 | Avg Reward:  2815.4 | Epsilon: 0.174 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 350 | Reward:  2911.7 | Avg Reward:  2818.0 | Epsilon: 0.173 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 351 | Reward:  2838.7 | Avg Reward:  2818.8 | Epsilon: 0.172 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 352 | Reward:  2828.7 | Avg Reward:  2819.1 | Epsilon: 0.171 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 353 | Reward:  2895.7 | Avg Reward:  2820.4 | Epsilon: 0.170 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 354 | Reward:  2802.7 | Avg Reward:  2824.6 | Epsilon: 0.170 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 355 | Reward:  2930.7 | Avg Reward:  2825.9 | Epsilon: 0.169 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 356 | Reward:  2856.7 | Avg Reward:  2826.3 | Epsilon: 0.168 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 357 | Reward:  2923.7 | Avg Reward:  2826.2 | Epsilon: 0.167
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 358 | Reward:  2809.7 | Avg Reward:  2827.8 | Epsilon: 0.166 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 359 | Reward:  2833.7 | Avg Reward:  2829.9 | Epsilon: 0.165 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 360 | Reward:  2835.7 | Avg Reward:  2830.9 | Epsilon: 0.165 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 361 | Reward:  2960.7 | Avg Reward:  2835.2 | Epsilon: 0.164 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 362 | Reward:  2953.7 | Avg Reward:  2839.4 | Epsilon: 0.163 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 363 | Reward:  3010.7 | Avg Reward:  2840.9 | Epsilon: 0.162 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 364 | Reward:  2971.7 | Avg Reward:  2842.5 | Epsilon: 0.161 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 365 | Reward:  2827.7 | Avg Reward:  2841.3 | Epsilon: 0.160
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 366 | Reward:  2971.7 | Avg Reward:  2844.1 | Epsilon: 0.160 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 367 | Reward:  2924.7 | Avg Reward:  2845.1 | Epsilon: 0.159 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 368 | Reward:  3089.7 | Avg Reward:  2848.4 | Epsilon: 0.158 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 369 | Reward:  2885.7 | Avg Reward:  2849.1 | Epsilon: 0.157 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 370 | Reward:  2922.7 | Avg Reward:  2851.9 | Epsilon: 0.157 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 371 | Reward:  2949.7 | Avg Reward:  2852.6 | Epsilon: 0.156 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 372 | Reward:  2908.7 | Avg Reward:  2853.5 | Epsilon: 0.155 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 373 | Reward:  3004.7 | Avg Reward:  2856.8 | Epsilon: 0.154 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 374 | Reward:  2979.7 | Avg Reward:  2859.1 | Epsilon: 0.153 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 375 | Reward:  2949.7 | Avg Reward:  2860.2 | Epsilon: 0.153 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 376 | Reward:  2915.7 | Avg Reward:  2861.1 | Epsilon: 0.152 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 377 | Reward:  2971.7 | Avg Reward:  2862.8 | Epsilon: 0.151 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 378 | Reward:  2868.7 | Avg Reward:  2863.1 | Epsilon: 0.150 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 379 | Reward:  2847.7 | Avg Reward:  2863.2 | Epsilon: 0.150 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 380 | Reward:  2971.7 | Avg Reward:  2864.9 | Epsilon: 0.149 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 381 | Reward:  2953.7 | Avg Reward:  2867.2 | Epsilon: 0.148 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 382 | Reward:  2919.7 | Avg Reward:  2866.9 | Epsilon: 0.147
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 383 | Reward:  2868.7 | Avg Reward:  2867.5 | Epsilon: 0.147 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 384 | Reward:  2966.7 | Avg Reward:  2869.9 | Epsilon: 0.146 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 385 | Reward:  2937.7 | Avg Reward:  2870.1 | Epsilon: 0.145 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 386 | Reward:  3035.7 | Avg Reward:  2873.0 | Epsilon: 0.144 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 387 | Reward:  2929.7 | Avg Reward:  2874.9 | Epsilon: 0.144 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 388 | Reward:  3003.7 | Avg Reward:  2876.6 | Epsilon: 0.143 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 389 | Reward:  2991.7 | Avg Reward:  2879.0 | Epsilon: 0.142 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 390 | Reward:  2942.7 | Avg Reward:  2879.2 | Epsilon: 0.142 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 391 | Reward:  2984.7 | Avg Reward:  2881.6 | Epsilon: 0.141 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 392 | Reward:  2989.7 | Avg Reward:  2883.5 | Epsilon: 0.140 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 393 | Reward:  2949.7 | Avg Reward:  2885.7 | Epsilon: 0.139 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 394 | Reward:  2784.7 | Avg Reward:  2886.0 | Epsilon: 0.139 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 395 | Reward:  2926.7 | Avg Reward:  2888.6 | Epsilon: 0.138 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 396 | Reward:  3057.7 | Avg Reward:  2889.8 | Epsilon: 0.137 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 397 | Reward:  2892.7 | Avg Reward:  2889.8 | Epsilon: 0.137 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 398 | Reward:  2936.7 | Avg Reward:  2890.3 | Epsilon: 0.136 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 399 | Reward:  2947.7 | Avg Reward:  2892.5 | Epsilon: 0.135 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 400 | Reward:  2825.7 | Avg Reward:  2892.0 | Epsilon: 0.135
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 401 | Reward:  3028.7 | Avg Reward:  2895.4 | Epsilon: 0.134 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 402 | Reward:  2990.7 | Avg Reward:  2896.5 | Epsilon: 0.133 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 403 | Reward:  2875.7 | Avg Reward:  2897.4 | Epsilon: 0.133 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 404 | Reward:  3005.7 | Avg Reward:  2900.1 | Epsilon: 0.132 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 405 | Reward:  2939.7 | Avg Reward:  2901.7 | Epsilon: 0.131 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 406 | Reward:  3006.7 | Avg Reward:  2905.2 | Epsilon: 0.131 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 407 | Reward:  2957.7 | Avg Reward:  2906.9 | Epsilon: 0.130 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 408 | Reward:  3042.7 | Avg Reward:  2909.1 | Epsilon: 0.129 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 409 | Reward:  3047.7 | Avg Reward:  2912.1 | Epsilon: 0.129 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 410 | Reward:  3002.7 | Avg Reward:  2914.1 | Epsilon: 0.128 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 411 | Reward:  2976.7 | Avg Reward:  2914.8 | Epsilon: 0.127 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 412 | Reward:  3002.7 | Avg Reward:  2917.2 | Epsilon: 0.127 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 413 | Reward:  2915.7 | Avg Reward:  2917.8 | Epsilon: 0.126 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 414 | Reward:  3015.7 | Avg Reward:  2918.5 | Epsilon: 0.126 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 415 | Reward:  2965.7 | Avg Reward:  2920.2 | Epsilon: 0.125 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 416 | Reward:  2913.7 | Avg Reward:  2921.3 | Epsilon: 0.124 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 417 | Reward:  2979.7 | Avg Reward:  2923.2 | Epsilon: 0.124 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 418 | Reward:  2890.7 | Avg Reward:  2924.2 | Epsilon: 0.123 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 419 | Reward:  2924.7 | Avg Reward:  2925.0 | Epsilon: 0.122 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 420 | Reward:  3029.7 | Avg Reward:  2925.8 | Epsilon: 0.122 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 421 | Reward:  2942.7 | Avg Reward:  2926.0 | Epsilon: 0.121 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 422 | Reward:  3010.7 | Avg Reward:  2927.4 | Epsilon: 0.121 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 423 | Reward:  2949.7 | Avg Reward:  2928.6 | Epsilon: 0.120 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 424 | Reward:  2876.7 | Avg Reward:  2930.4 | Epsilon: 0.119 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 425 | Reward:  2979.7 | Avg Reward:  2932.3 | Epsilon: 0.119 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 426 | Reward:  2907.7 | Avg Reward:  2932.6 | Epsilon: 0.118 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 427 | Reward:  3036.7 | Avg Reward:  2934.5 | Epsilon: 0.118 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 428 | Reward:  2928.7 | Avg Reward:  2935.0 | Epsilon: 0.117 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 429 | Reward:  3029.7 | Avg Reward:  2936.8 | Epsilon: 0.116 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 430 | Reward:  2952.7 | Avg Reward:  2936.8 | Epsilon: 0.116 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 431 | Reward:  2914.7 | Avg Reward:  2935.9 | Epsilon: 0.115
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 432 | Reward:  3005.7 | Avg Reward:  2937.4 | Epsilon: 0.115 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 433 | Reward:  2947.7 | Avg Reward:  2937.4 | Epsilon: 0.114 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 434 | Reward:  3053.7 | Avg Reward:  2939.5 | Epsilon: 0.114 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 435 | Reward:  2981.7 | Avg Reward:  2939.9 | Epsilon: 0.113 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 436 | Reward:  2921.7 | Avg Reward:  2940.7 | Epsilon: 0.112 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 437 | Reward:  2979.7 | Avg Reward:  2941.4 | Epsilon: 0.112 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 438 | Reward:  2949.7 | Avg Reward:  2941.4 | Epsilon: 0.111 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 439 | Reward:  3090.7 | Avg Reward:  2943.9 | Epsilon: 0.111 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 440 | Reward:  3045.7 | Avg Reward:  2945.3 | Epsilon: 0.110 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 441 | Reward:  3023.7 | Avg Reward:  2946.1 | Epsilon: 0.110 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 442 | Reward:  3017.7 | Avg Reward:  2948.2 | Epsilon: 0.109 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 443 | Reward:  3073.7 | Avg Reward:  2950.0 | Epsilon: 0.109 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 444 | Reward:  3011.7 | Avg Reward:  2950.7 | Epsilon: 0.108 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 445 | Reward:  2993.7 | Avg Reward:  2951.8 | Epsilon: 0.107 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 446 | Reward:  2875.7 | Avg Reward:  2950.9 | Epsilon: 0.107
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 447 | Reward:  2845.7 | Avg Reward:  2949.7 | Epsilon: 0.106
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 448 | Reward:  3024.7 | Avg Reward:  2950.3 | Epsilon: 0.106
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 449 | Reward:  2945.7 | Avg Reward:  2950.3 | Epsilon: 0.105
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 450 | Reward:  3000.7 | Avg Reward:  2951.2 | Epsilon: 0.105
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 451 | Reward:  2983.7 | Avg Reward:  2952.6 | Epsilon: 0.104 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 452 | Reward:  2953.7 | Avg Reward:  2953.9 | Epsilon: 0.104 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 453 | Reward:  2950.7 | Avg Reward:  2954.4 | Epsilon: 0.103 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 454 | Reward:  2946.7 | Avg Reward:  2955.9 | Epsilon: 0.103 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 455 | Reward:  3057.7 | Avg Reward:  2957.1 | Epsilon: 0.102 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 456 | Reward:  2950.7 | Avg Reward:  2958.1 | Epsilon: 0.102 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 457 | Reward:  2979.7 | Avg Reward:  2958.6 | Epsilon: 0.101 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 458 | Reward:  3005.7 | Avg Reward:  2960.6 | Epsilon: 0.101 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 459 | Reward:  3032.7 | Avg Reward:  2962.6 | Epsilon: 0.100 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 460 | Reward:  2998.7 | Avg Reward:  2964.2 | Epsilon: 0.100 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 461 | Reward:  3021.7 | Avg Reward:  2964.8 | Epsilon: 0.099 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 462 | Reward:  3002.7 | Avg Reward:  2965.3 | Epsilon: 0.099 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 463 | Reward:  2943.7 | Avg Reward:  2964.6 | Epsilon: 0.098
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 464 | Reward:  2891.7 | Avg Reward:  2963.8 | Epsilon: 0.098
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 465 | Reward:  2976.7 | Avg Reward:  2965.3 | Epsilon: 0.097 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 466 | Reward:  2997.7 | Avg Reward:  2965.6 | Epsilon: 0.097 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 467 | Reward:  2991.7 | Avg Reward:  2966.3 | Epsilon: 0.096 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 468 | Reward:  3044.7 | Avg Reward:  2965.8 | Epsilon: 0.096
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 469 | Reward:  3034.7 | Avg Reward:  2967.3 | Epsilon: 0.095 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 470 | Reward:  3031.7 | Avg Reward:  2968.4 | Epsilon: 0.095 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 471 | Reward:  3012.7 | Avg Reward:  2969.0 | Epsilon: 0.094 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 472 | Reward:  3079.7 | Avg Reward:  2970.7 | Epsilon: 0.094 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 473 | Reward:  3031.7 | Avg Reward:  2971.0 | Epsilon: 0.093 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 474 | Reward:  2998.7 | Avg Reward:  2971.2 | Epsilon: 0.093 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 475 | Reward:  2896.7 | Avg Reward:  2970.7 | Epsilon: 0.092
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 476 | Reward:  3067.7 | Avg Reward:  2972.2 | Epsilon: 0.092 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 477 | Reward:  3012.7 | Avg Reward:  2972.6 | Epsilon: 0.092 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 478 | Reward:  2999.7 | Avg Reward:  2973.9 | Epsilon: 0.091 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 479 | Reward:  3014.7 | Avg Reward:  2975.6 | Epsilon: 0.091 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 480 | Reward:  3026.7 | Avg Reward:  2976.1 | Epsilon: 0.090 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 481 | Reward:  3002.7 | Avg Reward:  2976.6 | Epsilon: 0.090 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 482 | Reward:  3024.7 | Avg Reward:  2977.7 | Epsilon: 0.089 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 483 | Reward:  2940.7 | Avg Reward:  2978.4 | Epsilon: 0.089 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 484 | Reward:  2953.7 | Avg Reward:  2978.2 | Epsilon: 0.088
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 485 | Reward:  3074.4 | Avg Reward:  2979.6 | Epsilon: 0.088 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 486 | Reward:  3024.7 | Avg Reward:  2979.5 | Epsilon: 0.088
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 487 | Reward:  3051.7 | Avg Reward:  2980.7 | Epsilon: 0.087 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 488 | Reward:  2967.7 | Avg Reward:  2980.4 | Epsilon: 0.087
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 489 | Reward:  2969.7 | Avg Reward:  2980.1 | Epsilon: 0.086
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 490 | Reward:  3036.7 | Avg Reward:  2981.1 | Epsilon: 0.086 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 491 | Reward:  3089.7 | Avg Reward:  2982.1 | Epsilon: 0.085 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 492 | Reward:  3002.7 | Avg Reward:  2982.3 | Epsilon: 0.085 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 493 | Reward:  2959.7 | Avg Reward:  2982.4 | Epsilon: 0.084 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 494 | Reward:  2979.7 | Avg Reward:  2984.3 | Epsilon: 0.084 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 495 | Reward:  3013.7 | Avg Reward:  2985.2 | Epsilon: 0.084 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🌟 Ep 496 | Reward:  2943.7 | Avg Reward:  2984.0 | Epsilon: 0.083
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 497 | Reward:  3070.7 | Avg Reward:  2985.8 | Epsilon: 0.083 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 498 | Reward:  3034.7 | Avg Reward:  2986.8 | Epsilon: 0.082 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 499 | Reward:  3046.7 | Avg Reward:  2987.8 | Epsilon: 0.082 | NEW BEST!
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+🏆 Ep 500 | Reward:  3063.7 | Avg Reward:  2990.2 | Epsilon: 0.082 | NEW BEST!
+
+🎯 Module 1 Training Finished. Best model saved to 'module1_best.pth'
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
