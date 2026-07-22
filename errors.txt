@@ -1,5 +1,7 @@
-(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ python3 plot_results.py
-Plot generated from 338 episodes.
-/home/heisenberg/ns3-workspace/rl-agent/training/plot_results.py:52: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
-  plt.show()
+heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$  source /home/heisenberg/ns3-workspace/rl-venv/bin/activate
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ python3 evaluate_metrics.py
+  File "/home/heisenberg/ns3-workspace/rl-agent/training/evaluate_metrics.py", line 63
+    if action == 0 and prev_hp_q := (state[1] * 20.0) > next_state[1] * 20.0:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: cannot use assignment expressions with expression
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
