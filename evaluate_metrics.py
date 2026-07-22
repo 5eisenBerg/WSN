@@ -32,9 +32,10 @@ def evaluate_policy(env, policy_type="DQN"):
     wrr_counter = 0
     
     for step in range(1, STEPS + 1):
-        hp_q = state[1]
-        normal_q = state[0]
-        age = state[3]
+        # Store state values before the step
+        hp_q_before = state[1] * 20.0
+        normal_q_before = state[0] * 20.0
+        age_before = state[3] * 10.0
         
         # Determine Action based on policy
         if policy_type == "DQN":
@@ -42,14 +43,14 @@ def evaluate_policy(env, policy_type="DQN"):
             with torch.no_grad():
                 action = torch.argmax(agent(state_t)).item()
         elif policy_type == "StrictPriority":
-            if hp_q > 0: action = 0
-            elif normal_q > 0: action = 1
+            if hp_q_before > 0: action = 0
+            elif normal_q_before > 0: action = 1
             else: action = 3
         elif policy_type == "WeightedRoundRobin":
-            if hp_q > 0 and wrr_counter < 3:
+            if hp_q_before > 0 and wrr_counter < 3:
                 action = 0
                 wrr_counter += 1
-            elif normal_q > 0:
+            elif normal_q_before > 0:
                 action = 1
                 wrr_counter = 0
             else:
@@ -58,35 +59,41 @@ def evaluate_policy(env, policy_type="DQN"):
         # Step the environment
         next_state, _, done, truncated, _ = env.step(action)
         
-        # Track throughput and queue drops
-        ch_node = env.nodes[env.current_ch_id]
-        if action == 0 and prev_hp_q := (state[1] * 20.0) > next_state[1] * 20.0:
+        # Get state values after the step
+        hp_q_after = next_state[1] * 20.0
+        normal_q_after = next_state[0] * 20.0
+        
+        # --- FIX IS HERE: Track throughput and queue drops correctly ---
+        if action == 0 and hp_q_before > hp_q_after:
             successful_packets += 1
             high_priority_sent += 1
-        elif action == 1 and prev_normal_q := (state[0] * 20.0) > next_state[0] * 20.0:
+        elif action == 1 and normal_q_before > normal_q_after:
             successful_packets += 1
             normal_packets_sent += 1
-            total_delay += (age * 10.0) # Accumulate age/latency
-        elif action == 2:
+            total_delay += age_before # Accumulate age/latency of the sent packet
+        elif action == 2 and normal_q_before > normal_q_after:
             dropped_packets += 1
             
+        # Update running metrics for plotting
         step_latency.append(total_delay / max(1, normal_packets_sent))
         step_throughput.append(successful_packets / step)
         
         state = next_state
-        if done or truncated: break
+        if done or truncated:
+            break
         
     total_energy_final = sum([node['residual_energy'] for node in env.nodes])
     energy_depleted = total_energy_initial - total_energy_final
     
     # Calculate Final Metrics
     metrics = {
-        "Throughput (pkts/step)": successful_packets / STEPS,
+        "Throughput (pkts/sec)": successful_packets / STEPS,
         "Average Latency (s)": total_delay / max(1, normal_packets_sent),
         "Packet Loss Rate (%)": (dropped_packets / max(1, successful_packets + dropped_packets)) * 100,
         "Energy Efficiency (nJ/bit)": (energy_depleted * 1e9) / max(1, successful_packets * 800)
     }
     return metrics, step_latency, step_throughput
+
 
 # Run Evaluations
 dqn_m, dqn_lat, dqn_tp = evaluate_policy(env, "DQN")
