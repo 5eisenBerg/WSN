@@ -1,6 +1,17 @@
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ python3 evaluate_metrics.py
-Traceback (most recent call last):
-  File "/home/heisenberg/ns3-workspace/rl-agent/training/evaluate_metrics.py", line 18, in <module>
-    from wsn_env import WSNEnv
-ModuleNotFoundError: No module named 'wsn_env'
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+⚠️ WARNING: Trained model 'module1_python_best.pth' not found. The 'DQN' policy will perform random actions.
+📊 Running benchmark evaluations for Module 1...
+
+✅ Metrics benchmarks exported to 'wsn_comparison_metrics.xlsx':
+                      Throughput (pkts/sec)  Average Latency (s)  Packet Loss Rate (%)  Energy Efficiency (nJ/bit)
+Proposed DQN-Edge                     0.090                  0.0                   0.0                 1754.250847
+Strict Priority                       0.250                  0.0                   0.0                  736.374375
+Weighted Round Robin                  0.005                  0.0                   0.0                29651.119513
+
+✅ Throughput comparison plot saved to 'throughput_comparison.png'
+✅ Latency comparison plot saved to 'latency_comparison.png'
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
