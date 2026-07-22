@@ -1,7 +1,6 @@
-heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$  source /home/heisenberg/ns3-workspace/rl-venv/bin/activate
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ python3 evaluate_metrics.py
-  File "/home/heisenberg/ns3-workspace/rl-agent/training/evaluate_metrics.py", line 63
-    if action == 0 and prev_hp_q := (state[1] * 20.0) > next_state[1] * 20.0:
-       ^^^^^^^^^^^^^^^^^^^^^^^^^
-SyntaxError: cannot use assignment expressions with expression
+Traceback (most recent call last):
+  File "/home/heisenberg/ns3-workspace/rl-agent/training/evaluate_metrics.py", line 2, in <module>
+    import pandas as pd
+ModuleNotFoundError: No module named 'pandas'
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
