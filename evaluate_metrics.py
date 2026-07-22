@@ -1,3 +1,16 @@
+import sys
+import os
+
+# --- Ensure Python can locate local modules ---
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+# Add both 'training' folder and 'rl-agent' root to system path
+sys.path.append(CURRENT_DIR)
+sys.path.append(os.path.dirname(CURRENT_DIR))
+# Also check and append 'networks' if present
+networks_path = os.path.join(os.path.dirname(CURRENT_DIR), "networks")
+if os.path.exists(networks_path):
+    sys.path.append(networks_path)
+
 import numpy as np
 import pandas as pd
 import torch
@@ -6,17 +19,21 @@ from wsn_env import WSNEnv
 from network import DQN
 
 # --- Main Configuration ---
-# Load your trained model. Make sure 'module1_python_best.pth' exists.
-# If it doesn't, the script will warn you and the "DQN" policy will be random.
+# Load your trained Python model.
 try:
     env = WSNEnv()
     agent = DQN(state_size=env.STATE_SIZE, action_size=env.ACTION_SIZE)
-    agent.load_state_dict(torch.load("module1_python_best.pth"))
+    # Match the python trainer file naming output
+    model_path = os.path.join(CURRENT_DIR, "module1_python_best.pth")
+    if not os.path.exists(model_path):
+        # Fallback to local search
+        model_path = "module1_python_best.pth"
+        
+    agent.load_state_dict(torch.load(model_path))
     agent.eval()
     print("✅ Trained DQN model 'module1_python_best.pth' loaded successfully.")
 except FileNotFoundError:
     print("⚠️ WARNING: Trained model 'module1_python_best.pth' not found. The 'DQN' policy will perform random actions.")
-    # Fallback to a random agent if the model file is not found
     agent = None 
 except Exception as e:
     print(f"An error occurred loading the model: {e}")
