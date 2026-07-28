@@ -3,15 +3,20 @@ Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst othe
 Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
 Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
 See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
-✅ Successfully loaded your trained NS-3 C++ model: 'module1_best.pth'
-📊 Running benchmark evaluations for Module 1...
+✅ Environment and Network modules loaded successfully.
+⚠️ WARNING: Trained model '/home/heisenberg/ns3-workspace/rl-agent/training/module1_python_best.pth' not found. The 'DQN' policy will be RANDOM.
+📊 Starting Final Benchmark Evaluation...
+Evaluating DQN: 100%|████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4624.85it/s]
+Evaluating Strict Priority: 100%|████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5153.83it/s]
+Evaluating Weighted Round Robin: 100%|███████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5317.38it/s]
 
-✅ Metrics benchmarks exported to 'wsn_comparison_metrics.xlsx':
-                      Throughput (pkts/sec)  Average Latency (s)  Packet Loss Rate (%)  Energy Efficiency (nJ/bit)
-Proposed DQN-Edge                      0.22                  0.0                   0.0                  809.725060
-Strict Priority                        0.24                  0.0                   0.0                  722.132883
-Weighted Round Robin                   0.01                  0.0                   0.0                13661.885359
 
-✅ Throughput comparison plot saved to 'throughput_comparison.png'
-✅ Latency comparison plot saved to 'latency_comparison.png'
+✅ Final metrics exported to '/home/heisenberg/ns3-workspace/rl-agent/training/final_metrics_comparison.xlsx':
+                     FND (step) HNA (step) LND (step) Throughput (pkts/sec) Packet Delivery Ratio (%) Average Latency (s) Energy Efficiency (nJ/bit)
+Proposed DQN-Edge            -1         -1      >5000                0.1204                     100.0                 0.0                1310.647904
+Strict Priority              -1         -1      >5000                0.1074                     100.0                 0.0                1434.920159
+Weighted Round Robin         -1         -1      >5000                 0.122                     100.0                 0.0                1299.266564
+
+✅ Lifetime plot saved to '/home/heisenberg/ns3-workspace/rl-agent/training/network_lifetime_comparison.png'
+✅ Energy plot saved to '/home/heisenberg/ns3-workspace/rl-agent/training/residual_energy_comparison.png'
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
