@@ -1,0 +1,15 @@
+Energy consumption
+Network life time
+Packet delivery ratio
+End to end delay
+Throughput
+Load balancing
+Cluster stability
+Energy efficency
+Distancecto sink
+Mobility
+Queue length
+Signal strength
+Traffic load
+Node degrer
+Trust degree
