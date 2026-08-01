@@ -1,189 +1,199 @@
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ python3 run_final_pipeline.py
-🛠️ V26: Rebuilding NS-3 environment...
+🛠️ V30: Rebuilding NS-3...
 ✅ Build OK.
 
-🧠 V26: Training DQN with PER...
+🧠 V30: Training Final DQN...
 
---- Epoch 1/20 (Seed: 12345) ---
+--- Epoch 1/30 (Seed: 12345) ---
 Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
 Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
 Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
 See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Train DQN Run 1: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1500/1500 [00:01<00:00, 876.63it/s]
+Train DQN Run 1: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2000/2000 [00:03<00:00, 653.38it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 100: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2570.36it/s]
-Epoch 1 Val Score: 0.8094
-  🥇 New best model saved (Score: 0.8094)
+Eval DQN Run 100: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2490.94it/s]
+Epoch 1 Val Score: 0.7736
+  🥇 New best model saved (Score: 0.7736)
 
---- Epoch 2/20 (Seed: 12346) ---
+--- Epoch 2/30 (Seed: 12346) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Train DQN Run 2: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1500/1500 [00:04<00:00, 312.36it/s]
+Train DQN Run 2: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2000/2000 [00:06<00:00, 308.04it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 101: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 1996.07it/s]
-Epoch 2 Val Score: 0.6773
+Eval DQN Run 101: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2587.53it/s]
+Epoch 2 Val Score: 0.7868
+  🥇 New best model saved (Score: 0.7868)
 
---- Epoch 3/20 (Seed: 12347) ---
+--- Epoch 3/30 (Seed: 12347) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Train DQN Run 3: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1500/1500 [00:04<00:00, 306.58it/s]
+Train DQN Run 3: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2000/2000 [00:06<00:00, 308.00it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 102: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2646.24it/s]
-Epoch 3 Val Score: 0.8094
+Eval DQN Run 102: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2773.85it/s]
+Epoch 3 Val Score: 0.7403
 
---- Epoch 4/20 (Seed: 12348) ---
+--- Epoch 4/30 (Seed: 12348) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Train DQN Run 4: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1500/1500 [00:04<00:00, 304.48it/s]
+Train DQN Run 4: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2000/2000 [00:06<00:00, 298.07it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 103: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2656.19it/s]
-Epoch 4 Val Score: 0.8094
+Eval DQN Run 103: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2753.32it/s]
+Epoch 4 Val Score: 0.6313
 
---- Epoch 5/20 (Seed: 12349) ---
+--- Epoch 5/30 (Seed: 12349) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Train DQN Run 5: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1500/1500 [00:05<00:00, 295.84it/s]
+Train DQN Run 5: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2000/2000 [00:06<00:00, 296.46it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 104: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2541.11it/s]
-Epoch 5 Val Score: 0.8094
+Eval DQN Run 104: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2716.84it/s]
+Epoch 5 Val Score: 0.7695
 
---- Epoch 6/20 (Seed: 12350) ---
+--- Epoch 6/30 (Seed: 12350) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Train DQN Run 6: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1500/1500 [00:05<00:00, 293.80it/s]
+Train DQN Run 6: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2000/2000 [00:07<00:00, 259.39it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 105: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2601.64it/s]
-Epoch 6 Val Score: 0.7183
+Eval DQN Run 105: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 2342.10it/s]
+Epoch 6 Val Score: 0.7480
+
+--- Epoch 7/30 (Seed: 12351) ---
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+Train DQN Run 7: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2000/2000 [00:07<00:00, 251.63it/s]
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+Eval DQN Run 106: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1000/1000 [00:00<00:00, 1233.46it/s]
+Epoch 7 Val Score: 0.6513
 --- Early stopping triggered ---
 
-📊 V26: Final Evaluation over 10 Independent Seed Runs...
+📊 V30: Final Evaluation...
 
 --- Eval Run 1/10 (Seed: 12545) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 1: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2836.25it/s]
+Eval DQN Run 1: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:02<00:00, 2432.04it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 1: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5231.42it/s]
+Eval StrictPriority Run 1: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4766.15it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 1: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4497.70it/s]
+Eval Random Run 1: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4627.43it/s]
 
 --- Eval Run 2/10 (Seed: 12546) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 2: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2605.54it/s]
+Eval DQN Run 2: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2564.17it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 2: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5074.89it/s]
+Eval StrictPriority Run 2: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4676.78it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 2: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5118.07it/s]
+Eval Random Run 2: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4276.79it/s]
 
 --- Eval Run 3/10 (Seed: 12547) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 3: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2815.11it/s]
+Eval DQN Run 3: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:02<00:00, 2418.50it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 3: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5331.70it/s]
+Eval StrictPriority Run 3: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4764.83it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 3: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5192.43it/s]
+Eval Random Run 3: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4624.45it/s]
 
 --- Eval Run 4/10 (Seed: 12548) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 4: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2748.35it/s]
+Eval DQN Run 4: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:02<00:00, 2496.81it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 4: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5349.14it/s]
+Eval StrictPriority Run 4: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4588.18it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 4: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5296.33it/s]
+Eval Random Run 4: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4545.16it/s]
 
 --- Eval Run 5/10 (Seed: 12549) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 5: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2852.18it/s]
+Eval DQN Run 5: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:02<00:00, 2485.72it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 5: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5167.16it/s]
+Eval StrictPriority Run 5: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4631.25it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 5: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4831.40it/s]
+Eval Random Run 5: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4803.49it/s]
 
 --- Eval Run 6/10 (Seed: 12550) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 6: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2838.02it/s]
+Eval DQN Run 6: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:02<00:00, 2477.55it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 6: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5329.45it/s]
+Eval StrictPriority Run 6: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4661.03it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 6: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5113.79it/s]
+Eval Random Run 6: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4675.44it/s]
 
 --- Eval Run 7/10 (Seed: 12551) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 7: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2860.06it/s]
+Eval DQN Run 7: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2534.41it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 7: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5348.67it/s]
+Eval StrictPriority Run 7: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4660.60it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 7: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4393.65it/s]
+Eval Random Run 7: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4749.89it/s]
 
 --- Eval Run 8/10 (Seed: 12552) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 8: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2765.83it/s]
+Eval DQN Run 8: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:02<00:00, 2427.43it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 8: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5150.16it/s]
+Eval StrictPriority Run 8: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4694.96it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 8: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4737.99it/s]
+Eval Random Run 8: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4634.20it/s]
 
 --- Eval Run 9/10 (Seed: 12553) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 9: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2814.94it/s]
+Eval DQN Run 9: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2548.14it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 9: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5259.83it/s]
+Eval StrictPriority Run 9: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4691.88it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 9: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4678.42it/s]
+Eval Random Run 9: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4340.57it/s]
 
 --- Eval Run 10/10 (Seed: 12554) ---
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 10: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2777.04it/s]
+Eval DQN Run 10: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 2564.90it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval StrictPriority Run 10: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5242.95it/s]
+Eval StrictPriority Run 10: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4812.14it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval Random Run 10: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:00<00:00, 5283.39it/s]
+Eval Random Run 10: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 5000/5000 [00:01<00:00, 4625.50it/s]
 
 
---- FINAL RESULTS (V26, MEAN ± 95% CI) ---
-                  throughput_kbps         pdr_pct         plr_pct avg_normal_delay_s  avg_hp_delay_s    energy_nj_bit
-Proposed DQN-Edge   7.9984±0.0000  99.9800±0.0000   0.0000±0.0000      0.0000±0.0000   0.0000±0.0000  218.3574±1.5293
-Strict Priority     7.9984±0.0000  99.9800±0.0000   0.0000±0.0000      0.0000±0.0000   0.0000±0.0000  218.3574±1.5293
-Random              3.4769±0.0562  43.4613±0.7029  48.0944±1.2518     37.9000±3.5374  14.1290±2.3250  372.4379±3.7931
+--- FINAL RESULTS (V30, MEAN ± 95% CI) ---
+                  throughput_kbps         pdr_pct         plr_pct avg_normal_delay_s avg_hp_delay_s     energy_nj_bit
+Proposed DQN-Edge   7.0536±0.0543  97.9130±0.3185   0.0000±0.0000      6.1935±1.0651  0.1256±0.0723  331.0563±25.2750
+Strict Priority     7.0536±0.0543  97.9130±0.3185   0.0000±0.0000      6.1935±1.0651  0.1256±0.0723  331.0563±25.2750
+Random              2.2896±0.0381  31.8251±0.4253  55.4728±1.1052     61.8735±5.7405  3.9891±0.5012  591.6097±27.7097
 
-✅ Results exported successfully to 'final_results_v26.xlsx'
+✅ Results exported to 'final_results_v30.xlsx'
 T-test for throughput_kbps (DQN vs SP): p-value=nan
 T-test for pdr_pct (DQN vs SP): p-value=nan
 T-test for plr_pct (DQN vs SP): p-value=nan
