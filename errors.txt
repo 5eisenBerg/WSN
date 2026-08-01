@@ -1,26 +1,21 @@
-(rl-venv) heisenberg@heisenberg:~/ns3-workspace/bake/source/ns-3.40$ ./ns3 build
-[0/2] Re-checking globbed directories...
-[1/2] Building CXX object scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o
-FAILED: scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o 
-/usr/bin/c++ -DEIGEN_MPL2_ONLY -DHAVE_BOOST -DHAVE_BOOST_UNITS -DHAVE_EIGEN3 -DHAVE_GSL -DHAVE_LIBXML2 -DHAVE_PACKET_H -DHAVE_SQLITE3 -DNS3_ASSERT_ENABLE -DNS3_BUILD_PROFILE_DEBUG -DNS3_LOG_ENABLE -DPROJECT_SOURCE_PATH=\"/home/heisenberg/ns3-workspace/bake/source/ns-3.40\" -DRAW_SOCK_CREATOR=\"/home/heisenberg/ns3-workspace/bake/source/ns-3.40/build/src/fd-net-device/ns3.40-raw-sock-creator-default\" -DTAP_DEV_CREATOR=\"/home/heisenberg/ns3-workspace/bake/source/ns-3.40/build/src/fd-net-device/ns3.40-tap-device-creator-default\" -D__LINUX__ -I/home/heisenberg/ns3-workspace/bake/source/ns-3.40/build/include -I/usr -I/usr/include/eigen3 -I/usr/include/freetype2 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/include/gdk-pixbuf-2.0 -I/usr/include/gtk-3.0 -I/usr/include/cairo -I/usr/include/pango-1.0 -I/usr/include/harfbuzz -I/usr/include/atk-1.0 -I/usr/include/libxml2 -O2 -g -DNDEBUG -std=c++17 -fPIE   -fno-semantic-interposition -fdiagnostics-color=always -Wall -Winvalid-pch -include /home/heisenberg/ns3-workspace/bake/source/ns-3.40/cmake-cache/CMakeFiles/stdlib_pch_exec.dir/cmake_pch.hxx -MD -MT scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o -MF scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o.d -o scratch/CMakeFiles/scratch_wsn_100dynamic.dir/wsn_100dynamic.cc.o -c /home/heisenberg/ns3-workspace/bake/source/ns-3.40/scratch/wsn_100dynamic.cc
-/home/heisenberg/ns3-workspace/bake/source/ns-3.40/scratch/wsn_100dynamic.cc: In function ‘void ScheduleNextStep(uint32_t, uint32_t&)’:
-/home/heisenberg/ns3-workspace/bake/source/ns-3.40/scratch/wsn_100dynamic.cc:203:15: warning: suggest parentheses around ‘&&’ within ‘||’ [-Wparentheses]
-  203 |     if (c > 0 && g_nodesState[g_currentCH].residualEnergy < INITIAL_ENERGY * 0.05 || (c > 0 && c % 20 == 0)) {
-      |         ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from /home/heisenberg/ns3-workspace/bake/source/ns-3.40/src/core/model/event-id.h:23,
-                 from /home/heisenberg/ns3-workspace/bake/source/ns-3.40/build/include/ns3/event-id.h:1,
-                 from /home/heisenberg/ns3-workspace/bake/source/ns-3.40/src/core/helper/event-garbage-collector.h:22,
-                 from /home/heisenberg/ns3-workspace/bake/source/ns-3.40/build/include/ns3/event-garbage-collector.h:1,
-                 from /home/heisenberg/ns3-workspace/bake/source/ns-3.40/build/include/ns3/core-module.h:8,
-                 from /home/heisenberg/ns3-workspace/bake/source/ns-3.40/scratch/wsn_100dynamic.cc:1:
-/home/heisenberg/ns3-workspace/bake/source/ns-3.40/src/core/model/ptr.h: In instantiation of ‘ns3::Ptr<T>::Ptr(const ns3::Ptr<U>&) [with U = ns3::Node; T = const ns3::MobilityModel]’:
-/home/heisenberg/ns3-workspace/bake/source/ns-3.40/scratch/wsn_100dynamic.cc:138:99:   required from here
-/home/heisenberg/ns3-workspace/bake/source/ns-3.40/src/core/model/ptr.h:713:24: error: cannot convert ‘ns3::Node*’ to ‘const ns3::MobilityModel*’ in initialization
-  713 |     : m_ptr(PeekPointer(o))
-      |             ~~~~~~~~~~~^~~
-      |                        |
-      |                        ns3::Node*
-ninja: build stopped: subcommand failed.
-Finished executing the following commands:
-cd cmake-cache; /usr/bin/cmake --build . -j 7 ; cd ..
-(rl-venv) heisenberg@heisenberg:~/ns3-workspace/bake/source/ns-3.40$ 
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ python3 run_final_pipeline.py
+🛠️ V37: Rebuilding NS-3...
+✅ Build OK.
+
+🧠 V37: Training Final DQN...
+
+--- Epoch 1/30 (Seed: 12345) ---
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+Train DQN Run 1: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 2000/2000 [00:03<00:00, 635.56it/s]
+Traceback (most recent call last):
+  File "/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py", line 168, in <module>
+    _, training_agent = run_simulation("DQN", TRAIN_STEPS_PER_EPOCH, True, epoch + 1, agent=training_agent, seed=epoch_seed)
+  File "/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py", line 142, in run_simulation
+    final_info_str = env.get_extra_info()
+AttributeError: 'Ns3Env' object has no attribute 'get_extra_info'
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
