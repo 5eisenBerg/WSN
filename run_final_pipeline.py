@@ -4,17 +4,17 @@ from tqdm import tqdm
 import scipy.stats as stats
 from per import PrioritizedReplayBuffer
 
-# --- V30 Config ---
+# --- V37 Config ---
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(os.path.dirname(CURRENT_DIR), 'networks'))
 from network import DQN
 NS3_PATH = '/home/heisenberg/ns3-workspace/bake/source/ns-3.40'
 SIM_SCRIPT = 'wsn_100dynamic'
 PORT = 5555
-MODEL_PATH = os.path.join(CURRENT_DIR, "v30_best.pth")
+MODEL_PATH = os.path.join(CURRENT_DIR, "v37_best.pth")
 STATE_SIZE, ACTION_SIZE = 7, 5
 TRAINING_EPOCHS, TRAIN_STEPS_PER_EPOCH, EVAL_STEPS, BASE_SEED = 30, 2000, 5000, 12345
-HP_REWARD, NORMAL_REWARD, DROP_NORMAL_PENALTY, DROP_HP_PENALTY, IDLE_PENALTY, DELAY_WEIGHT, CONGESTION_WEIGHT, ENERGY_WEIGHT = 40, 15, -35, -200, -2, -20, -10, -5000
+HP_REWARD, NORMAL_REWARD, DROP_NORMAL_PENALTY, DROP_HP_PENALTY, IDLE_PENALTY, HP_DELAY_WEIGHT, NORMAL_DELAY_WEIGHT = 60, 20, -80, -300, -5, -40, -20
 
 random.seed(BASE_SEED)
 np.random.seed(BASE_SEED)
@@ -54,31 +54,19 @@ class PER_DoubleDQNAgent:
         beta = min(1.0, self.beta_start + self.train_steps * (1.0 - self.beta_start) / self.beta_frames)
         samples, idx, w = self.memory.sample(128, beta)
         s, a, r, ns, d = zip(*samples)
-        s = torch.FloatTensor(np.array(s))
-        a = torch.LongTensor(a).unsqueeze(1)
-        r = torch.FloatTensor(r).unsqueeze(1)
-        ns = torch.FloatTensor(np.array(ns))
-        d = torch.FloatTensor(d).unsqueeze(1)
-        w = torch.FloatTensor(w).unsqueeze(1)
-
+        s = torch.FloatTensor(np.array(s)); a = torch.LongTensor(a).unsqueeze(1); r = torch.FloatTensor(r).unsqueeze(1)
+        ns = torch.FloatTensor(np.array(ns)); d = torch.FloatTensor(d).unsqueeze(1); w = torch.FloatTensor(w).unsqueeze(1)
         curr_q = self.model(s).gather(1, a)
         with torch.no_grad():
             next_a = self.model(ns).argmax(1).unsqueeze(1)
             target_q = r + 0.99 * self.target(ns).gather(1, next_a) * (1 - d)
-        
         td_error = torch.abs(target_q - curr_q)
         loss = (w * F.smooth_l1_loss(curr_q, target_q, reduction='none')).mean()
-        
-        self.optimizer.zero_grad()
-        loss.backward()
-        torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
-        self.optimizer.step()
-        self.scheduler.step()
-
+        self.optimizer.zero_grad(); loss.backward(); torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0); self.optimizer.step(); self.scheduler.step()
         prios = td_error.detach().cpu().numpy().flatten() + 1e-5
         self.memory.update_priorities(idx, prios)
-        
-        self.epsilon = max(0.05, self.epsilon * 0.999)
+        if len(self.memory) > self.warmup:
+            self.epsilon = max(0.05, self.epsilon * 0.9995)
         self._soft_update_target()
         self.train_steps += 1
 
@@ -91,55 +79,33 @@ class PER_DoubleDQNAgent:
         self.memory.add(s, a, r, ns, d)
 
     def save(self, p):
-        torch.save({
-            "model": self.model.state_dict(),
-            "optimizer": self.optimizer.state_dict(),
-            "scheduler": self.scheduler.state_dict(),
-            "epsilon": self.epsilon,
-            "step": self.train_steps
-        }, p)
+        torch.save({"model": self.model.state_dict(), "optimizer": self.optimizer.state_dict(), "scheduler": self.scheduler.state_dict(), "epsilon": self.epsilon, "step": self.train_steps}, p)
 
     def load(self, p):
         c = torch.load(p, map_location="cpu")
-        self.model.load_state_dict(c["model"])
-        self.optimizer.load_state_dict(c["optimizer"])
-        self.scheduler.load_state_dict(c["scheduler"])
-        self.epsilon = c["epsilon"]
-        self.train_steps = c["step"]
-        self.target.load_state_dict(self.model.state_dict())
+        self.model.load_state_dict(c["model"]); self.optimizer.load_state_dict(c["optimizer"]); self.scheduler.load_state_dict(c["scheduler"])
+        self.epsilon = c["epsilon"]; self.train_steps = c["step"]; self.target.load_state_dict(self.model.state_dict())
 
-def calculate_reward(s, ps, a):
-    r = 0.0
+def calculate_reward(s, ps, info):
+    r = info.get('hp_sent', 0) * HP_REWARD + info.get('normal_sent', 0) * NORMAL_REWARD
+    r += info.get('hp_dropped', 0) * DROP_HP_PENALTY + info.get('normal_dropped', 0) * DROP_NORMAL_PENALTY
+    r += info.get('hp_timeout', 0) * DROP_HP_PENALTY * 1.2 + info.get('normal_timeout', 0) * DROP_NORMAL_PENALTY * 1.2
+    r += HP_DELAY_WEIGHT * s[4] + NORMAL_DELAY_WEIGHT * s[3]
     ec = ps[2] - s[2]
-    if ps[1] > s[1]:
-        r += (HP_REWARD if a == 0 else DROP_HP_PENALTY)
-    if ps[0] > s[0]:
-        r += (NORMAL_REWARD if a == 1 else DROP_NORMAL_PENALTY)
-    
-    r += DELAY_WEIGHT * max(0, s[3] - ps[3])
-    r += CONGESTION_WEIGHT * max(0, s[0] - ps[0])
-    
-    if a == 3:
-        r += IDLE_PENALTY
     if ec > 0:
-        r += ENERGY_WEIGHT * ec
-        
-    return np.tanh(r / 100.0)
+        r -= ec * 5000
+    if info.get('action') == 3:
+        r += IDLE_PENALTY
+    return np.tanh(r / 250.0)
 
 def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=BASE_SEED):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    from ns3gym import ns3env
-    
+    random.seed(seed); np.random.seed(seed); torch.manual_seed(seed); from ns3gym import ns3env
     cmd = f"./ns3 run '{SIM_SCRIPT} --openGymPort={PORT} --run={run_id}'"
     p = subprocess.Popen(cmd, cwd=NS3_PATH, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     time.sleep(3)
-    
     try:
         env = ns3env.Ns3Env(port=PORT, startSim=False)
         s = np.array(env.reset(), dtype=np.float32)
-        
         if agent is None:
             agent = PER_DoubleDQNAgent()
             if policy == "DQN" and not train_mode:
@@ -147,11 +113,9 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
                     agent.load(MODEL_PATH)
                     agent.epsilon = 0.0
                 except FileNotFoundError:
-                    print("⚠️ Model not found. DQN is RANDOM.")
-                    policy = "Random"
+                    print("⚠️ Model not found. DQN is RANDOM."); policy = "Random"
         elif policy == "DQN" and not train_mode:
             agent.epsilon = 0.0
-            
         bar = tqdm(range(steps), desc=f"{'Eval' if not train_mode else 'Train'} {policy} Run {run_id}")
         for step in bar:
             ps = s
@@ -165,93 +129,75 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
                 else: a = 3
             else:
                 a = np.random.randint(ACTION_SIZE)
-                
-            s, _, d, info = env.step(a)
+            s, _, d, info_str = env.step(a)
+            info = json.loads(info_str)
+            info['action'] = a
             s = np.array(s, dtype=np.float32)
-            
             if train_mode:
-                r = calculate_reward(s, ps, a)
+                r = calculate_reward(s, ps, info)
                 agent.remember(ps, a, r, s, d)
                 agent.train()
             if d:
                 break
-        return (json.loads(info) if info else {}, agent)
+        final_info_str = env.get_extra_info()
+        return (json.loads(final_info_str) if final_info_str else {}, agent)
     finally:
-        try:
-            env.close()
-        except:
-            pass
+        try: env.close()
+        except: pass
         p.kill()
         subprocess.run(f"pkill -9 -f {SIM_SCRIPT}", shell=True, check=False)
         time.sleep(1)
 
 def get_eval_score(res):
-    t,p,plr,nd,hd,e = res.get('throughput_kbps',0),res.get('pdr_pct',0),res.get('plr_pct',0),res.get('avg_normal_delay_s',5),res.get('avg_hp_delay_s',5),res.get('energy_nj_bit',10000)
-    norm_t=min(t/200.0,1.0); norm_p=p/100.0; norm_plr=plr/100.0
-    norm_nd=1.0-min(nd/5.0,1.0); norm_hd=1.0-min(hd/5.0,1.0); norm_e=1.0-min(e/10000.0,1.0)
-    score=(0.3*norm_t+0.4*norm_p-0.1*norm_plr+0.1*norm_nd+0.2*norm_hd+0.1*norm_e)
-    return np.clip(score,0.0,1.0)
+    t, p, plr, nd, hd, e = res.get('throughput_kbps', 0), res.get('pdr_pct', 0), res.get('plr_pct', 0), res.get('avg_normal_delay_s', 5), res.get('avg_hp_delay_s', 5), res.get('energy_nj_bit', 10000)
+    norm_t = min(t / 200.0, 1.0); norm_p = p / 100.0; norm_plr = plr / 100.0
+    norm_nd = 1.0 - min(nd / 5.0, 1.0); norm_hd = 1.0 - min(hd / 5.0, 1.0); norm_e = 1.0 - min(e / 10000.0, 1.0)
+    score = (0.3 * norm_t + 0.4 * norm_p - 0.1 * norm_plr + 0.1 * norm_nd + 0.2 * norm_hd + 0.1 * norm_e)
+    return np.clip(score, 0.0, 1.0)
 
 if __name__ == '__main__':
-    print("🛠️ V30: Rebuilding NS-3..."); build = subprocess.run(f"./ns3 build", cwd=NS3_PATH, shell=True, capture_output=True, text=True)
+    print("🛠️ V37: Rebuilding NS-3..."); build = subprocess.run(f"./ns3 build", cwd=NS3_PATH, shell=True, capture_output=True, text=True)
     if build.returncode != 0:
-        print(f"❌ Build Fail:\n{build.stderr}")
-        sys.exit(1)
+        print(f"❌ Build Fail:\n{build.stderr}"); sys.exit(1)
     print("✅ Build OK.")
-    
-    training_agent = PER_DoubleDQNAgent()
-    best_eval_score = float("-inf")
-    best_epoch = 0
-    train_log = []
-    
-    print("\n🧠 V30: Training Final DQN...")
+    training_agent = PER_DoubleDQNAgent(); best_eval_score = float("-inf"); best_epoch = 0; train_log = []
+    print("\n🧠 V37: Training Final DQN...")
     for epoch in range(TRAINING_EPOCHS):
         epoch_seed = BASE_SEED + epoch
         print(f"\n--- Epoch {epoch+1}/{TRAINING_EPOCHS} (Seed: {epoch_seed}) ---")
         _, training_agent = run_simulation("DQN", TRAIN_STEPS_PER_EPOCH, True, epoch + 1, agent=training_agent, seed=epoch_seed)
-        
         val_res, _ = run_simulation("DQN", 1000, False, 100 + epoch, agent=training_agent)
         score = get_eval_score(val_res)
         print(f"Epoch {epoch+1} Val Score: {score:.4f}")
         train_log.append({"epoch": epoch + 1, "score": score})
-        
         if score > best_eval_score:
-            best_eval_score = score
-            best_epoch = epoch
-            training_agent.save(MODEL_PATH)
+            best_eval_score = score; best_epoch = epoch; training_agent.save(MODEL_PATH)
             print(f"  🥇 New best model saved (Score: {best_eval_score:.4f})")
-            
         if epoch - best_epoch >= 5:
-            print("--- Early stopping triggered ---")
-            break
-            
-    pd.DataFrame(train_log).to_csv("training_log_v30.csv", index=False)
+            print("--- Early stopping triggered ---"); break
+    pd.DataFrame(train_log).to_csv("training_log_v37.csv", index=False)
     
-    print("\n📊 V30: Final Evaluation...")
+    print("\n📊 V37: Final Evaluation...")
     results = {"Proposed DQN-Edge": [], "Strict Priority": [], "Random": []}
     policy_map = {"Proposed DQN-Edge": "DQN", "Strict Priority": "StrictPriority", "Random": "Random"}
-    
     for i in range(10):
         run_seed = BASE_SEED + 200 + i
         print(f"\n--- Eval Run {i+1}/10 (Seed: {run_seed}) ---")
         for label, policy in policy_map.items():
             metrics, _ = run_simulation(policy, EVAL_STEPS, False, i + 1, seed=run_seed)
             results[label].append(metrics)
-            
     final = {}
     for p, r in results.items():
         df = pd.DataFrame(r)
         final[p] = {k: f"{df[k].mean():.4f}±{stats.t.ppf(0.975, len(df)-1) * df[k].std() / np.sqrt(len(df)):.4f}" for k in df.columns}
-        
     summary_df = pd.DataFrame(final).T
-    print("\n\n--- FINAL RESULTS (V30, MEAN ± 95% CI) ---")
+    print("\n\n--- FINAL RESULTS (V37, MEAN ± 95% CI) ---")
     print(summary_df.to_string())
-    summary_df.to_excel("final_results_v30.xlsx")
-    print("\n✅ Results exported to 'final_results_v30.xlsx'")
-    
+    summary_df.to_excel("final_results_v37.xlsx")
+    print("\n✅ Results exported to 'final_results_v37.xlsx'")
     for metric in results["Proposed DQN-Edge"][0].keys():
-        dqn_data = [r[metric] for r in results["Proposed DQN-Edge"] if r]
-        sp_data = [r[metric] for r in results["Strict Priority"] if r]
+        dqn_data = [r[metric] for r in results["Proposed DQN-Edge"] if r and metric in r]
+        sp_data = [r[metric] for r in results["Strict Priority"] if r and metric in r]
         if len(dqn_data) > 1 and len(sp_data) > 1:
             t, p_val = stats.ttest_rel(dqn_data, sp_data)
             print(f"T-test for {metric} (DQN vs SP): p-value={p_val:.4e}")
