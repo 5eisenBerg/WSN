@@ -1,30 +1,27 @@
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
-#include "ns3/lr-wpan-module.h"
 #include "ns3/mobility-module.h"
-#include "ns3/internet-module.h"
-#include "ns3/ipv4-address-helper.h"
 #include "ns3/opengym-module.h"
 #include "ns3/random-variable-stream.h"
 #include <sstream>
+#include <deque>
 #include <numeric>
-#include <cmath> // For std::abs, std::sqrt
+#include <cmath>
 
 using namespace ns3;
-NS_LOG_COMPONENT_DEFINE("WSN_Merged_V4_Fixed");
+NS_LOG_COMPONENT_DEFINE("WSN_Final_V26");
 
 // --- Constants ---
 #define NUM_NODES 100
 #define SENSOR_NODES (NUM_NODES - 3)
-#define INITIAL_ENERGY 0.1
+#define STATE_SIZE 6 // Queues, Energy, Delay, HP Flag, Neighbors
+#define INITIAL_ENERGY 0.5
 #define MAX_QUEUE_CAPACITY 20
 #define PACKET_BITS 800
 
 const double SENSING_ENERGY_NJ = 20.0;
-const double ALPHA = 0.7;
-const double BETA = 0.3;
-const double K1 = 3.0;
-const double K2 = 5.0;
+const double ALPHA = 0.7; // CH Election Energy Weight
+const double BETA = 0.3;  // CH Election Centrality Weight
 const double COMM_RANGE = 40.0;
 
 // --- Heinzelman First-Order Radio Model Parameters ---
@@ -33,16 +30,15 @@ const double E_FS = 10e-12;
 const double E_MP = 0.0013e-12;
 const double D0 = std::sqrt(E_FS / E_MP);
 
-struct WSNNode {
-    double residualEnergy = INITIAL_ENERGY;
-    double packetAge = 0.0;
-    double currentValue = 50.0;
-    double prevValue = 50.0;
-    double ewma_mu = 50.0;
-    double ewma_sigma_sq = 10.0;
-    int normal_q_len = 0;
-    int hp_q_len = 0;
-    int neighborCount = 0;
+struct PacketInfo { 
+    Time enqueueTime; 
+};
+
+struct WSNNode { 
+    double residualEnergy = INITIAL_ENERGY; 
+    std::deque<PacketInfo> normal_q; 
+    std::deque<PacketInfo> hp_q; 
+    int neighborCount = 0; 
 };
 
 static WSNNode g_nodesState[NUM_NODES];
@@ -56,9 +52,11 @@ static uint64_t g_packetsGenerated = 0;
 static uint64_t g_packetsDelivered = 0;
 static uint64_t g_packetsDropped = 0;
 static uint64_t g_normalPacketsDelivered = 0;
-static double g_totalDelay = 0.0;
+static uint64_t g_hpPacketsDelivered = 0;
+static double g_totalNormalDelay = 0.0;
+static double g_totalHpDelay = 0.0;
 
-// --- Energy Consumers ---
+// --- Energy Consumption Modules ---
 void ConsumeBitEnergy(uint32_t n, double b, double d) {
     if (g_nodesState[n].residualEnergy > 0.0) {
         double c = E_ELEC * b;
@@ -116,16 +114,9 @@ void ElectClusterHead() {
     }
 }
 
-void UpdateEWMA(uint32_t n, double v, double g = 0.1) {
-    g_nodesState[n].prevValue = g_nodesState[n].currentValue;
-    g_nodesState[n].currentValue = v;
-    g_nodesState[n].ewma_mu = (1.0 - g) * g_nodesState[n].ewma_mu + g * v;
-    g_nodesState[n].ewma_sigma_sq = (1.0 - g) * g_nodesState[n].ewma_sigma_sq + g * std::pow(v - g_nodesState[n].ewma_mu, 2.0);
-}
-
-// --- FIXED: Explicit Float Literals and Dtype Strings for newer OpenGym API ---
+// --- OpenGym Interface Callbacks ---
 Ptr<OpenGymSpace> GetObservationSpace() { 
-    return CreateObject<OpenGymBoxSpace>(0.0f, 1.0f, std::vector<uint32_t>{5}, "float"); 
+    return CreateObject<OpenGymBoxSpace>(0.0f, 1.0f, std::vector<uint32_t>{STATE_SIZE}, "float"); 
 }
 
 Ptr<OpenGymSpace> GetActionSpace() { 
@@ -142,35 +133,33 @@ Ptr<OpenGymDataContainer> GetObservation() {
     g_packetsGenerated++;
     ConsumeJouleEnergy(taskNode, SENSING_ENERGY_NJ);
     
-    double value = g_rand->GetValue(20.0, 90.0);
-    UpdateEWMA(taskNode, value);
-    
     double dist = g_allNodes.Get(taskNode)->GetObject<MobilityModel>()->GetDistanceFrom(g_allNodes.Get(g_currentCH)->GetObject<MobilityModel>());
     ConsumeBitEnergy(taskNode, PACKET_BITS, dist);
     ConsumeBitEnergy(g_currentCH, PACKET_BITS, 0.0);
     
-    // Fixed: Explicit double calculations with std namespace
-    double sigma = std::sqrt(std::max(1e-9, g_nodesState[taskNode].ewma_sigma_sq));
-    if (std::abs(g_nodesState[taskNode].currentValue - g_nodesState[taskNode].prevValue) > K2 * sigma) {
-        if (g_nodesState[g_currentCH].hp_q_len < MAX_QUEUE_CAPACITY) {
-            g_nodesState[g_currentCH].hp_q_len++;
+    // Generates 20% High-Priority Alert traffic, 80% Normal traffic
+    if (g_rand->GetValue() < 0.2) { 
+        if (g_nodesState[g_currentCH].hp_q.size() < MAX_QUEUE_CAPACITY) {
+            g_nodesState[g_currentCH].hp_q.push_back({Simulator::Now()});
         } else {
             g_packetsDropped++;
         }
-    } else if (std::abs(g_nodesState[taskNode].currentValue - g_nodesState[taskNode].ewma_mu) > K1 * sigma) {
-        if (g_nodesState[g_currentCH].normal_q_len < MAX_QUEUE_CAPACITY) {
-            g_nodesState[g_currentCH].normal_q_len++;
+    } else { 
+        if (g_nodesState[g_currentCH].normal_q.size() < MAX_QUEUE_CAPACITY) {
+            g_nodesState[g_currentCH].normal_q.push_back({Simulator::Now()});
         } else {
             g_packetsDropped++;
         }
     }
     
-    auto box = CreateObject<OpenGymBoxContainer<double>>(std::vector<uint32_t>{5});
-    box->AddValue((double)g_nodesState[g_currentCH].normal_q_len / MAX_QUEUE_CAPACITY);
-    box->AddValue((double)g_nodesState[g_currentCH].hp_q_len / MAX_QUEUE_CAPACITY);
+    auto box = CreateObject<OpenGymBoxContainer<double>>(std::vector<uint32_t>{STATE_SIZE});
+    double normal_age = g_nodesState[g_currentCH].normal_q.empty() ? 0.0 : (Simulator::Now() - g_nodesState[g_currentCH].normal_q.front().enqueueTime).GetSeconds();
+    box->AddValue((double)g_nodesState[g_currentCH].normal_q.size() / MAX_QUEUE_CAPACITY);
+    box->AddValue((double)g_nodesState[g_currentCH].hp_q.size() / MAX_QUEUE_CAPACITY);
     box->AddValue(g_nodesState[g_currentCH].residualEnergy / INITIAL_ENERGY);
-    box->AddValue(std::min(1.0, g_nodesState[g_currentCH].packetAge / 20.0));
-    box->AddValue(g_nodesState[g_currentCH].hp_q_len > 0 ? 1.0 : 0.0);
+    box->AddValue(std::min(1.0, normal_age / 5.0));
+    box->AddValue(g_nodesState[g_currentCH].hp_q.empty() ? 0.0 : 1.0);
+    box->AddValue((double)g_nodesState[g_currentCH].neighborCount / (SENSOR_NODES - 1));
     return box;
 }
 
@@ -184,9 +173,11 @@ bool GetGameOver() {
 
 std::string GetExtraInfo() {
     double simTime = Simulator::Now().GetSeconds();
-    double tput = (simTime > 0.0) ? (g_packetsDelivered / simTime) : 0.0;
+    double tput = (simTime > 0.0) ? (g_packetsDelivered * PACKET_BITS / simTime) / 1000.0 : 0.0;
     double pdr = (g_packetsGenerated > 0) ? ((double)g_packetsDelivered / g_packetsGenerated) * 100.0 : 0.0;
-    double delay = (g_normalPacketsDelivered > 0) ? (g_totalDelay / g_normalPacketsDelivered) : 0.0;
+    double plr = (g_packetsGenerated > 0) ? ((double)g_packetsDropped / g_packetsGenerated) * 100.0 : 0.0;
+    double normal_delay = (g_normalPacketsDelivered > 0) ? (g_totalNormalDelay / g_normalPacketsDelivered) : 0.0;
+    double hp_delay = (g_hpPacketsDelivered > 0) ? (g_totalHpDelay / g_hpPacketsDelivered) : 0.0;
     
     double totalEnergy = 0.0;
     for (uint32_t i = 0; i < SENSOR_NODES; ++i) {
@@ -196,36 +187,35 @@ std::string GetExtraInfo() {
     double efficiency = (g_packetsDelivered > 0) ? (energy_consumed * 1e9) / (g_packetsDelivered * PACKET_BITS) : 0.0;
     
     std::stringstream ss;
-    ss << "{\"throughput\":" << tput 
-       << ",\"pdr\":" << pdr 
-       << ",\"avg_delay\":" << delay 
-       << ",\"energy_efficiency\":" << efficiency << "}";
+    ss << "{\"throughput_kbps\":" << tput 
+       << ",\"pdr_pct\":" << pdr 
+       << ",\"plr_pct\":" << plr 
+       << ",\"avg_normal_delay_s\":" << normal_delay 
+       << ",\"avg_hp_delay_s\":" << hp_delay 
+       << ",\"energy_nj_bit\":" << efficiency << "}";
     return ss.str();
 }
 
 bool ExecuteActions(Ptr<OpenGymDataContainer> a) {
     uint32_t act = DynamicCast<OpenGymDiscreteContainer>(a)->GetValue();
-    if (g_nodesState[g_currentCH].normal_q_len > 0) {
-        g_nodesState[g_currentCH].packetAge += 0.1;
-    } else {
-        g_nodesState[g_currentCH].packetAge = 0.0;
-    }
     
-    if (act == 0 && g_nodesState[g_currentCH].hp_q_len > 0) {
-        g_nodesState[g_currentCH].hp_q_len--;
+    if (act == 0 && !g_nodesState[g_currentCH].hp_q.empty()) {
+        PacketInfo p = g_nodesState[g_currentCH].hp_q.front();
+        g_nodesState[g_currentCH].hp_q.pop_front();
+        g_totalHpDelay += (Simulator::Now() - p.enqueueTime).GetSeconds();
+        g_hpPacketsDelivered++;
         g_packetsDelivered++;
         ConsumeBitEnergy(g_currentCH, PACKET_BITS, 70.0);
-    } else if (act == 1 && g_nodesState[g_currentCH].normal_q_len > 0) {
-        g_totalDelay += g_nodesState[g_currentCH].packetAge;
+    } else if (act == 1 && !g_nodesState[g_currentCH].normal_q.empty()) {
+        PacketInfo p = g_nodesState[g_currentCH].normal_q.front();
+        g_nodesState[g_currentCH].normal_q.pop_front();
+        g_totalNormalDelay += (Simulator::Now() - p.enqueueTime).GetSeconds();
         g_normalPacketsDelivered++;
-        g_nodesState[g_currentCH].normal_q_len--;
         g_packetsDelivered++;
-        g_nodesState[g_currentCH].packetAge = 0.0;
         ConsumeBitEnergy(g_currentCH, PACKET_BITS, 70.0);
-    } else if (act == 2 && g_nodesState[g_currentCH].normal_q_len > 0) {
-        g_nodesState[g_currentCH].normal_q_len--;
+    } else if (act == 2 && !g_nodesState[g_currentCH].normal_q.empty()) {
+        g_nodesState[g_currentCH].normal_q.pop_front();
         g_packetsDropped++;
-        g_nodesState[g_currentCH].packetAge = 0.0;
     }
     return true;
 }
@@ -244,10 +234,15 @@ void ScheduleNextStep(uint32_t i, uint32_t& c) {
 }
 
 int main(int argc, char* argv[]) {
-    CommandLine cmd;
     uint32_t port = 5555;
+    uint32_t run = 1;
+    CommandLine cmd;
     cmd.AddValue("openGymPort", "Port", port);
+    cmd.AddValue("run", "Run Number", run);
     cmd.Parse(argc, argv);
+    
+    SeedManager::SetSeed(12345);
+    SeedManager::SetRun(run);
     
     g_rand = CreateObject<UniformRandomVariable>();
     g_allNodes.Create(NUM_NODES);
@@ -262,11 +257,15 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < NUM_NODES; ++i) {
         g_nodesState[i] = WSNNode();
     }
+    
     g_packetsGenerated = 0;
     g_packetsDelivered = 0;
     g_packetsDropped = 0;
-    g_totalDelay = 0.0;
+    g_totalNormalDelay = 0.0;
+    g_totalHpDelay = 0.0;
     g_normalPacketsDelivered = 0;
+    g_hpPacketsDelivered = 0;
+    
     ElectClusterHead();
     
     g_gym = CreateObject<OpenGymInterface>(port);
