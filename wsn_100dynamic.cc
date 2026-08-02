@@ -8,13 +8,13 @@
 #include <numeric>
 
 using namespace ns3;
-NS_LOG_COMPONENT_DEFINE("WSN_Final_V51");
+NS_LOG_COMPONENT_DEFINE("WSN_Final_V53");
 
 #define NUM_NODES 101
 #define SENSOR_NODES 100
 #define SINK_NODE_ID 100
 #define STATE_SIZE 7
-#define ACTION_SIZE 5
+#define ACTION_SIZE 6
 #define INITIAL_ENERGY 0.5
 #define MAX_QUEUE_CAPACITY 30
 #define PACKET_BITS 800
@@ -57,20 +57,20 @@ Ptr<OpenGymDataContainer> GetObservation(){
     uint32_t hp_timeout_drops=0, n_timeout_drops=0;
     while(!g_nodesState[g_currentCH].hp_q.empty()&&(Simulator::Now()-g_nodesState[g_currentCH].hp_q.front().enqueueTime).GetSeconds()>HP_TIMEOUT){g_nodesState[g_currentCH].hp_q.pop_front();g_packetsDropped++;hp_timeout_drops++;}
     while(!g_nodesState[g_currentCH].normal_q.empty()&&(Simulator::Now()-g_nodesState[g_currentCH].normal_q.front().enqueueTime).GetSeconds()>NORMAL_TIMEOUT){g_nodesState[g_currentCH].normal_q.pop_front();g_packetsDropped++;n_timeout_drops++;}
-    std::stringstream ss;ss<<"{\"hp_timeout\":"<<hp_timeout_drops<<",\"normal_timeout\":"<<n_timeout_drops<<"}";g_per_step_info=ss.str();
     int numPackets=g_rand->GetInteger(1,4);
     for(int i=0;i<numPackets;++i){
-        if(g_rand->GetValue()<0.6){
+        if(g_rand->GetValue()<0.7){
             uint32_t taskNode=g_rand->GetInteger(0,SENSOR_NODES-1);int attempts=0;
             while((taskNode==g_currentCH||g_nodesState[taskNode].residualEnergy<=0)&&attempts++<100)taskNode=g_rand->GetInteger(0,SENSOR_NODES-1);
             if(attempts<100){g_packetsGenerated++;ConsumeJouleEnergy(taskNode,SENSING_ENERGY_NJ);double dist=g_allNodes.Get(taskNode)->GetObject<MobilityModel>()->GetDistanceFrom(g_allNodes.Get(g_currentCH)->GetObject<MobilityModel>());ConsumeBitEnergy(taskNode,PACKET_BITS,dist);ConsumeBitEnergy(g_currentCH,PACKET_BITS,0);
             if(g_rand->GetValue()<0.25){if(g_nodesState[g_currentCH].hp_q.size()<MAX_QUEUE_CAPACITY)g_nodesState[g_currentCH].hp_q.push_back({Simulator::Now()});else g_packetsDropped++;}
             else{if(g_nodesState[g_currentCH].normal_q.size()<MAX_QUEUE_CAPACITY)g_nodesState[g_currentCH].normal_q.push_back({Simulator::Now()});else g_packetsDropped++;}}}}
+    std::stringstream ss;ss<<"{\"hp_timeout\":"<<hp_timeout_drops<<",\"normal_timeout\":"<<n_timeout_drops<<"}"; g_per_step_info = ss.str();
     auto box=CreateObject<OpenGymBoxContainer<double>>(std::vector<uint32_t>{STATE_SIZE});
     double n_age=g_nodesState[g_currentCH].normal_q.empty()?0.0:(Simulator::Now()-g_nodesState[g_currentCH].normal_q.front().enqueueTime).GetSeconds();
     double hp_age=g_nodesState[g_currentCH].hp_q.empty()?0.0:(Simulator::Now()-g_nodesState[g_currentCH].hp_q.front().enqueueTime).GetSeconds();
     double dist_to_sink=g_allNodes.Get(g_currentCH)->GetObject<MobilityModel>()->GetDistanceFrom(g_allNodes.Get(SINK_NODE_ID)->GetObject<MobilityModel>());
-    box->AddValue((double)g_nodesState[g_currentCH].normal_q.size()/MAX_QUEUE_CAPACITY);box->AddValue((double)g_nodesState[g_currentCH].hp_q.size()/MAX_QUEUE_CAPACITY);box->AddValue(g_nodesState[g_currentCH].residualEnergy/INITIAL_ENERGY);box->AddValue(std::min(1.0,n_age/NORMAL_TIMEOUT));box->AddValue(std::min(1.0,hp_age/HP_TIMEOUT));box->AddValue((double)g_nodesState[g_currentCH].neighborCount/(SENSOR_NODES-1));box->AddValue(std::min(1.0,dist_to_sink/200.0));
+    box->AddValue((double)g_nodesState[g_currentCH].normal_q.size()/MAX_QUEUE_CAPACITY);box->AddValue((double)g_nodesState[g_currentCH].hp_q.size()/MAX_QUEUE_CAPACITY);box->AddValue(g_nodesState[g_currentCH].residualEnergy/INITIAL_ENERGY);box->AddValue(std::min(1.0,n_age/NORMAL_TIMEOUT));box->AddValue(std::min(1.0,hp_age/HP_TIMEOUT));box->AddValue((double)g_nodesState[g_currentCH].neighborCount/(SENSOR_NODES-1));box->AddValue(std::min(1.0,dist_to_sink/158.0));
     return box;
 }
 bool ExecuteActions(Ptr<OpenGymDataContainer> a){
@@ -81,6 +81,7 @@ bool ExecuteActions(Ptr<OpenGymDataContainer> a){
     else if(act==2&&!g_nodesState[g_currentCH].normal_q.empty()){g_nodesState[g_currentCH].normal_q.pop_front();g_packetsDropped++;n_d=1;}
     else if(act==3){ConsumeJouleEnergy(g_currentCH,SLEEP_ENERGY_NJ);}
     else if(act==4&&!g_nodesState[g_currentCH].hp_q.empty()){g_nodesState[g_currentCH].hp_q.pop_front();g_packetsDropped++;hp_d=1;}
+    else if(act==5){for(int i=0;i<3&&!g_nodesState[g_currentCH].normal_q.empty();++i){PacketInfo p=g_nodesState[g_currentCH].normal_q.front();g_nodesState[g_currentCH].normal_q.pop_front();g_totalNormalDelay+=(Simulator::Now()-p.enqueueTime).GetSeconds();g_normalPacketsDelivered++;g_packetsDelivered++;ConsumeBitEnergy(g_currentCH,PACKET_BITS,dist_to_sink);n_s++;}}
     else {ConsumeJouleEnergy(g_currentCH,IDLE_ENERGY_NJ);}
     std::string current_info=g_per_step_info;current_info.pop_back();
     std::stringstream ss;ss<<",\"hp_sent\":"<<hp_s<<",\"normal_sent\":"<<n_s<<",\"hp_dropped\":"<<hp_d<<",\"normal_dropped\":"<<n_d<<"}";
