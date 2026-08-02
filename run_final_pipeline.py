@@ -1,20 +1,31 @@
-import sys, os, subprocess, time, json, numpy as np, pandas as pd, torch, torch.optim as optim, torch.nn.functional as F, random
+import sys
+import os
+import subprocess
+import time
+import json
+import numpy as np
+import pandas as pd
+import torch
+import torch.optim as optim
+import torch.nn.functional as F
+import random
 from collections import deque
 from tqdm import tqdm
 import scipy.stats as stats
 from per import PrioritizedReplayBuffer
 
-# --- V43 Config ---
+# --- V50 Config ---
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(os.path.dirname(CURRENT_DIR), 'networks'))
 from network import DQN
+
 NS3_PATH = '/home/heisenberg/ns3-workspace/bake/source/ns-3.40'
 SIM_SCRIPT = 'wsn_100dynamic'
 PORT = 5555
-MODEL_PATH = os.path.join(CURRENT_DIR, "v43_best.pth")
+MODEL_PATH = os.path.join(CURRENT_DIR, "v50_best.pth")
 STATE_SIZE, ACTION_SIZE = 7, 5
 TRAINING_EPOCHS, TRAIN_STEPS_PER_EPOCH, EVAL_STEPS, BASE_SEED = 30, 2000, 5000, 12345
-HP_REWARD, NORMAL_REWARD, DROP_NORMAL_PENALTY, DROP_HP_PENALTY, IDLE_PENALTY, HP_DELAY_WEIGHT, NORMAL_DELAY_WEIGHT = 60, 20, -80, -300, -5, -40, -20
+HP_REWARD, NORMAL_REWARD, DROP_NORMAL_PENALTY, DROP_HP_PENALTY, SLEEP_PENALTY, HP_DELAY_WEIGHT, NORMAL_DELAY_WEIGHT = 60, 20, -80, -300, -5, -40, -20
 
 random.seed(BASE_SEED)
 np.random.seed(BASE_SEED)
@@ -75,7 +86,7 @@ class PER_DoubleDQNAgent:
         torch.nn.utils.clip_grad_norm_(self.model.parameters(), 1.0)
         self.optimizer.step()
         self.scheduler.step()
-
+        
         prios = td_error.detach().cpu().numpy().flatten() + 1e-5
         self.memory.update_priorities(idx, prios)
         
@@ -120,8 +131,7 @@ def calculate_reward(s, ps, info):
     if ec > 0:
         r -= ec * 5000
     if info.get('action') == 3:
-        r += IDLE_PENALTY
-        
+        r += SLEEP_PENALTY
     return np.tanh(r / 250.0)
 
 def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=BASE_SEED):
@@ -139,7 +149,6 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
     try:
         env = ns3env.Ns3Env(port=PORT, startSim=False)
         s = np.array(env.reset(), dtype=np.float32)
-        
         if agent is None:
             agent = PER_DoubleDQNAgent()
             if policy == "DQN" and not train_mode:
@@ -154,48 +163,40 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
             agent.epsilon = 0.0
         
         final_info = {}
-        done_flag = False
         bar = tqdm(range(steps), desc=f"{'Eval' if not train_mode else 'Train'} {policy} Run {run_id}")
         for step in bar:
             ps = s.copy()
-            
             if train_mode and len(agent.memory) < agent.warmup:
                 a = np.random.randint(ACTION_SIZE)
             elif policy == "DQN":
                 a = agent.act(s)
             elif policy == "StrictPriority":
-                if s[1] > 0: a = 0
-                elif s[0] > 0: a = 1
-                else: a = 3
+                if s[1] > 0:
+                    a = 0
+                elif s[0] > 0:
+                    a = 1
+                else:
+                    a = 3
             else:
                 a = np.random.randint(ACTION_SIZE)
             
-            s, _, d, info_str = env.step(a)
-            info = json.loads(info_str)
+            s_next, _, d, info_str = env.step(a)
+            info = json.loads(info_str if info_str else '{}')
             info['action'] = a
-            s = np.array(s, dtype=np.float32)
+            s_next = np.array(s_next, dtype=np.float32)
             
             if train_mode:
-                r = calculate_reward(s, ps, info)
-                agent.remember(ps, a, r, s, d)
+                r = 0 if d else calculate_reward(s_next, ps, info)
+                agent.remember(s, a, r, s_next, d)
                 agent.train()
-            
+                
+            s = s_next
             if d:
-                done_flag = True
-                final_info = info
+                # --- Robust GetFinalInfo RPC ---
+                final_info_str = env.rpc('GetFinalInfo')
+                final_info = json.loads(final_info_str) if final_info_str else {}
                 break
-        
-        shutdown_steps = 0
-        while not done_flag and shutdown_steps < 500:
-            _, _, d, info_str = env.step(3) # Send idle action
-            shutdown_steps += 1
-            if d:
-                done_flag = True
-                final_info = json.loads(info_str)
-        
-        if not done_flag:
-            print(f"⚠️ Warning: Simulation {run_id} did not terminate naturally after {steps + shutdown_steps} steps.")
-            
+                
         return (final_info, agent)
     finally:
         if original_epsilon is not None and agent is not None:
@@ -209,14 +210,18 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
         time.sleep(1)
 
 def get_eval_score(res):
-    t,p,plr,nd,hd,e = res.get('throughput_kbps',0),res.get('pdr_pct',0),res.get('plr_pct',0),res.get('avg_normal_delay_s',5),res.get('avg_hp_delay_s',5),res.get('energy_nj_bit',10000)
-    norm_t=min(t/200.0,1.0); norm_p=p/100.0; norm_plr=plr/100.0
-    norm_nd=1.0-min(nd/5.0,1.0); norm_hd=1.0-min(hd/5.0,1.0); norm_e=1.0-min(e/10000.0,1.0)
-    score=(0.3*norm_t+0.4*norm_p-0.1*norm_plr+0.1*norm_nd+0.2*norm_hd+0.1*norm_e)
-    return np.clip(score,0.0,1.0)
+    t, p, plr, nd, hd, e = res.get('throughput_kbps', 0), res.get('pdr_pct', 0), res.get('plr_pct', 0), res.get('avg_normal_delay_s', 5), res.get('avg_hp_delay_s', 5), res.get('energy_nj_bit', 10000)
+    norm_t = min(t / 200.0, 1.0)
+    norm_p = p / 100.0
+    norm_plr = plr / 100.0
+    norm_nd = 1.0 - min(nd / 5.0, 1.0)
+    norm_hd = 1.0 - min(hd / 5.0, 1.0)
+    norm_e = 1.0 - min(e / 10000.0, 1.0)
+    score = (0.3 * norm_t + 0.4 * norm_p - 0.1 * norm_plr + 0.1 * norm_nd + 0.2 * norm_hd + 0.1 * norm_e)
+    return np.clip(score, 0.0, 1.0)
 
 if __name__ == '__main__':
-    print("🛠️ V43: Rebuilding NS-3...")
+    print("🛠️ V50: Rebuilding NS-3...")
     build = subprocess.run(f"./ns3 build", cwd=NS3_PATH, shell=True, capture_output=True, text=True)
     if build.returncode != 0:
         print(f"❌ Build Fail:\n{build.stderr}")
@@ -228,7 +233,7 @@ if __name__ == '__main__':
     best_epoch = 0
     train_log = []
     
-    print("\n🧠 V43: Training Final DQN...")
+    print("\n🧠 V50: Training Final DQN...")
     for epoch in range(TRAINING_EPOCHS):
         epoch_seed = BASE_SEED + epoch
         print(f"\n--- Epoch {epoch+1}/{TRAINING_EPOCHS} (Seed: {epoch_seed}) ---")
@@ -248,13 +253,13 @@ if __name__ == '__main__':
             training_agent.save(MODEL_PATH)
             print(f"  🥇 New best model saved (Score: {best_eval_score:.4f})")
             
-        if epoch - best_epoch >= 5:
+        if epoch - best_epoch >= 10:
             print("--- Early stopping triggered ---")
             break
             
-    pd.DataFrame(train_log).to_csv("training_log_v43.csv", index=False)
+    pd.DataFrame(train_log).to_csv("training_log_v50.csv", index=False)
     
-    print("\n📊 V43: Final Evaluation...")
+    print("\n📊 V50: Final Evaluation...")
     results = {"Proposed DQN-Edge": [], "Strict Priority": [], "Random": []}
     policy_map = {"Proposed DQN-Edge": "DQN", "Strict Priority": "StrictPriority", "Random": "Random"}
     
@@ -276,10 +281,10 @@ if __name__ == '__main__':
         final[p] = {k: f"{df[k].mean():.4f}±{stats.t.ppf(0.975, len(df)-1) * df[k].std() / np.sqrt(len(df)):.4f}" for k in df.columns}
         
     summary_df = pd.DataFrame(final).T
-    print("\n\n--- FINAL RESULTS (V43, MEAN ± 95% CI) ---")
+    print("\n\n--- FINAL RESULTS (V50, MEAN ± 95% CI) ---")
     print(summary_df.to_string())
-    summary_df.to_excel("final_results_v43.xlsx")
-    print("\n✅ Results exported to 'final_results_v43.xlsx'")
+    summary_df.to_excel("final_results_v50.xlsx")
+    print("\n✅ Results exported to 'final_results_v50.xlsx'")
     
     if results["Proposed DQN-Edge"] and results["Strict Priority"]:
         for metric in results["Proposed DQN-Edge"][0].keys():
