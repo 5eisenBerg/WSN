@@ -11,10 +11,10 @@ Users of this version of Gym should be able to simply replace 'import gym' with 
 See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Train DQN Run 1: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▉| 2498/2500 [00:04<00:00, 510.79it/s]
+Train DQN Run 1: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▉| 2498/2500 [00:05<00:00, 457.22it/s]
 Waiting for simulation script to connect on port: tcp://localhost:5555
 Please start proper ns-3 simulation script using ./waf --run "..."
-Eval DQN Run 100:  50%|█████████████████████████████████████████████████████████▍                                                         | 2498/5000 [00:01<00:01, 2421.08it/s]
+Eval DQN Run 100:  50%|█████████████████████████████████████████████████████████▍                                                         | 2498/5000 [00:00<00:00, 2604.21it/s]
 Traceback (most recent call last):
   File "/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py", line 114, in <module>
     score=get_eval_score(val_res);print(f"Epoch {epoch+1} Val Score: {score:.4f}");train_log.append({"epoch":epoch+1,"score":score})
