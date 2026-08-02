@@ -13,7 +13,6 @@ random.seed(BASE_SEED);np.random.seed(BASE_SEED);torch.manual_seed(BASE_SEED)
 torch.backends.cudnn.deterministic=True;torch.backends.cudnn.benchmark=False
 
 class PER_DoubleDQNAgent:
-    # ... (Agent class is perfect and unchanged)
     def __init__(self, tau=0.005, warmup=1000, alpha=0.6, beta_start=0.4, beta_frames=100000):
         self.model=DQN(STATE_SIZE,ACTION_SIZE);self.target=DQN(STATE_SIZE,ACTION_SIZE);self.target.load_state_dict(self.model.state_dict());self.target.eval()
         self.optimizer=optim.Adam(self.model.parameters(),lr=1e-4);self.memory=PrioritizedReplayBuffer(100000,alpha);self.epsilon=1.0;self.train_steps=0;self.tau=tau;self.warmup=warmup
@@ -46,7 +45,6 @@ class PER_DoubleDQNAgent:
         self.epsilon=c["epsilon"];self.train_steps=c["step"];self.target.load_state_dict(self.model.state_dict())
 
 def calculate_reward(s, ps, info):
-    # V53: Dense, per-step reward
     reward = 0
     reward += info.get('hp_sent', 0) * 2.0
     reward += info.get('normal_sent', 0) * 1.0
@@ -54,12 +52,18 @@ def calculate_reward(s, ps, info):
     reward -= info.get('normal_dropped', 0) * 5.0
     reward -= info.get('hp_timeout', 0) * 12.0
     reward -= info.get('normal_timeout', 0) * 6.0
-    reward -= (ps[2] - s[2]) * 2000 # Energy consumption penalty
-    reward -= s[3] * 0.5 # Normal delay penalty
-    reward -= s[4] * 1.0 # HP delay penalty
+    reward -= (ps[2] - s[2]) * 2000
+    reward -= s[3] * 0.5
+    reward -= s[4] * 1.0
     return reward
 
-def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=BASE_SEED):
+def get_eval_score(res):
+    t,p,plr,nd,hd,e=res.get('throughput_kbps',0),res.get('pdr_pct',0),res.get('plr_pct',0),res.get('avg_normal_delay_s',5),res.get('avg_hp_delay_s',5),res.get('energy_nj_bit',10000)
+    norm_t=min(t/200.0,1.0);norm_p=p/100.0;norm_plr=plr/100.0;norm_nd=1.0-min(nd/5.0,1.0);norm_hd=1.0-min(hd/5.0,1.0);norm_e=1.0-min(e/10000.0,1.0)
+    score=(0.3*norm_t+0.4*norm_p-0.1*norm_plr+0.1*norm_nd+0.2*norm_hd+0.1*norm_e)
+    return np.clip(score,0.0,1.0)
+
+def run_simulation(policy,steps,train_mode=False,run_id=1,agent=None,seed=BASE_SEED):
     random.seed(seed);np.random.seed(seed);torch.manual_seed(seed);from ns3gym import ns3env
     cmd=f"./ns3 run '{SIM_SCRIPT} --openGymPort={PORT} --run={run_id}'";p=subprocess.Popen(cmd,cwd=NS3_PATH,shell=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);time.sleep(3)
     env=None;original_epsilon=None
@@ -78,13 +82,13 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
             elif policy=="DQN":a=agent.act(s)
             elif policy=="StrictPriority":
                 if s[1]>0:a=0
-                elif s[0]>25: a=5 # If normal queue is almost full, burst transmit
+                elif s[0]>25: a=5
                 elif s[0]>0: a=1
                 else: a=3
             else:a=np.random.randint(ACTION_SIZE)
-            s_next,_,d,info_str=env.step(a);info=json.loads(info_str if info_str else'{}');s_next=np.array(s_next,dtype=np.float32)
+            s_next,_,d,info_str=env.step(a);info=json.loads(info_str if info_str else'{}');info['action']=a;s_next=np.array(s_next,dtype=np.float32)
             if train_mode:
-                r = calculate_reward(s_next,ps,info)
+                r=calculate_reward(s_next,ps,info)
                 agent.remember(s,a,r,s_next,d)
                 agent.train()
             s=s_next
@@ -99,7 +103,6 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
         except:pass
         subprocess.run(f"pkill -9 -f {SIM_SCRIPT}",shell=True,check=False);time.sleep(1)
 
-# The main block and evaluation logic can remain the same.
 if __name__=='__main__':
     print("🛠️ V53: Rebuilding NS-3...");build=subprocess.run(f"./ns3 build",cwd=NS3_PATH,shell=True,capture_output=True,text=True)
     if build.returncode!=0:print(f"❌ Build Fail:\n{build.stderr}");sys.exit(1)
@@ -115,4 +118,23 @@ if __name__=='__main__':
         if score>best_eval_score:best_eval_score=score;best_epoch=epoch;training_agent.save(MODEL_PATH);print(f"  🥇 New best model saved (Score: {best_eval_score:.4f})")
         if epoch-best_epoch>=10:print("--- Early stopping triggered ---");break
     pd.DataFrame(train_log).to_csv("training_log_v53.csv",index=False)
-    # ... (evaluation logic remains the same)
+    print("\n📊 V53: Final Evaluation...")
+    results={"Proposed DQN-Edge":[],"Strict Priority":[],"Random":[]}
+    policy_map={"Proposed DQN-Edge":"DQN","Strict Priority":"StrictPriority","Random":"Random"}
+    for i in range(10):
+        run_seed=BASE_SEED+200+i;print(f"\n--- Eval Run {i+1}/10 (Seed: {run_seed}) ---")
+        for label,policy in policy_map.items():
+            metrics,_=run_simulation(policy,EVAL_STEPS,False,i+1,seed=run_seed)
+            if metrics:results[label].append(metrics)
+            else:print(f"Warning: Empty metrics for {label} on run {i+1}")
+    final={};
+    for p,r in results.items():
+        if not r:continue
+        df=pd.DataFrame(r);final[p]={k:f"{df[k].mean():.4f}±{stats.t.ppf(0.975,len(df)-1)*df[k].std()/np.sqrt(len(df)):.4f}" for k in df.columns}
+    summary_df=pd.DataFrame(final).T;print("\n\n--- FINAL RESULTS (V53, MEAN ± 95% CI) ---");print(summary_df.to_string())
+    summary_df.to_excel("final_results_v53.xlsx");print("\n✅ Results exported to 'final_results_v53.xlsx'")
+    if results["Proposed DQN-Edge"] and results["Strict Priority"]:
+        for metric in results["Proposed DQN-Edge"][0].keys():
+            dqn_data=[r[metric] for r in results["Proposed DQN-Edge"] if r and metric in r];sp_data=[r[metric] for r in results["Strict Priority"] if r and metric in r]
+            n=min(len(dqn_data),len(sp_data))
+            if n>1:t,p_val=stats.ttest_rel(dqn_data[:n],sp_data[:n]);print(f"T-test for {metric} (DQN vs SP): p-value={p_val:.4e}")
