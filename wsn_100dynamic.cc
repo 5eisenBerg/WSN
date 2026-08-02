@@ -6,9 +6,10 @@
 #include <sstream>
 #include <deque>
 #include <numeric>
+#include <cmath>
 
 using namespace ns3;
-NS_LOG_COMPONENT_DEFINE("WSN_Final_V37");
+NS_LOG_COMPONENT_DEFINE("WSN_Final_V43");
 
 #define NUM_NODES 101
 #define SENSOR_NODES 100
@@ -19,9 +20,18 @@ NS_LOG_COMPONENT_DEFINE("WSN_Final_V37");
 #define MAX_QUEUE_CAPACITY 30
 #define PACKET_BITS 800
 
-const double SENSING_ENERGY_NJ = 20.0, IDLE_ENERGY_NJ = 10.0, SLEEP_ENERGY_NJ = 1.0;
-const double HP_TIMEOUT = 2.0, NORMAL_TIMEOUT = 5.0;
-const double ALPHA = 0.7, BETA = 0.3, E_ELEC = 50e-9, E_FS = 10e-12, E_MP = 0.0013e-12, D0 = sqrt(E_FS / E_MP);
+const double SENSING_ENERGY_NJ = 20.0;
+const double IDLE_ENERGY_NJ = 10.0;
+const double SLEEP_ENERGY_NJ = 1.0;
+const double HP_TIMEOUT = 2.0;
+const double NORMAL_TIMEOUT = 5.0;
+
+const double ALPHA = 0.7;
+const double BETA = 0.3;
+const double E_ELEC = 50e-9;
+const double E_FS = 10e-12;
+const double E_MP = 0.0013e-12;
+const double D0 = sqrt(E_FS / E_MP);
 
 struct PacketInfo {
     Time enqueueTime;
@@ -39,8 +49,14 @@ static uint32_t g_currentCH = 0;
 static NodeContainer g_allNodes;
 static Ptr<OpenGymInterface> g_gym;
 static Ptr<UniformRandomVariable> g_rand;
-static uint64_t g_packetsGenerated = 0, g_packetsDelivered = 0, g_packetsDropped = 0, g_normalPacketsDelivered = 0, g_hpPacketsDelivered = 0;
-static double g_totalNormalDelay = 0.0, g_totalHpDelay = 0.0;
+
+static uint64_t g_packetsGenerated = 0;
+static uint64_t g_packetsDelivered = 0;
+static uint64_t g_packetsDropped = 0;
+static uint64_t g_normalPacketsDelivered = 0;
+static uint64_t g_hpPacketsDelivered = 0;
+static double g_totalNormalDelay = 0.0;
+static double g_totalHpDelay = 0.0;
 static std::string g_per_step_info = "";
 
 void ConsumeJouleEnergy(uint32_t n, double nj) {
@@ -205,7 +221,7 @@ bool ExecuteActions(Ptr<OpenGymDataContainer> a) {
     }
     
     std::string current_info = g_per_step_info;
-    current_info.pop_back(); // remove }
+    current_info.pop_back(); // remove '}'
     std::stringstream ss;
     ss << ",\"hp_sent\":" << hp_s << ",\"normal_sent\":" << n_s << ",\"hp_dropped\":" << hp_d << ",\"normal_dropped\":" << n_d << "}";
     current_info += ss.str();
@@ -216,7 +232,7 @@ bool ExecuteActions(Ptr<OpenGymDataContainer> a) {
 
 void ScheduleNextStep(uint32_t i, uint32_t& c) {
     if (g_gym->IsGameOver()) {
-        g_gym->NotifySimulationEnd();
+        // --- Populate final JSON blob before notifying simulation end ---
         double s=Simulator::Now().GetSeconds(); double t=(s>0)?(g_packetsDelivered*PACKET_BITS/s)/1000.0:0.0;
         double pdr=(g_packetsGenerated>0)?((double)g_packetsDelivered/g_packetsGenerated)*100.0:0.0;
         double plr=(g_packetsGenerated>0)?((double)g_packetsDropped/g_packetsGenerated)*100.0:0.0;
@@ -226,6 +242,7 @@ void ScheduleNextStep(uint32_t i, uint32_t& c) {
         double ec=(SENSOR_NODES*INITIAL_ENERGY)-te; double eff=(g_packetsDelivered>0)?(ec*1e9)/(g_packetsDelivered*PACKET_BITS):0.0;
         std::stringstream ss; ss<<"{\"throughput_kbps\":"<<t<<",\"pdr_pct\":"<<pdr<<",\"plr_pct\":"<<plr<<",\"avg_normal_delay_s\":"<<nd<<",\"avg_hp_delay_s\":"<<hd<<",\"energy_nj_bit\":"<<eff<<"}";
         g_per_step_info=ss.str();
+        g_gym->NotifySimulationEnd();
         return;
     }
     if ((c > 0 && g_nodesState[g_currentCH].residualEnergy < INITIAL_ENERGY * 0.05) || (c > 0 && c % 20 == 0)) {
@@ -242,24 +259,30 @@ int main(int argc, char* argv[]) {
     cmd.AddValue("openGymPort", "Port", p);
     cmd.AddValue("run", "Run", r);
     cmd.Parse(argc, argv);
+    
     SeedManager::SetSeed(12345);
     SeedManager::SetRun(r);
+    
     g_rand = CreateObject<UniformRandomVariable>();
     g_allNodes.Create(NUM_NODES);
+    
     Ptr<ListPositionAllocator> spa = CreateObject<ListPositionAllocator>();
     spa->Add(Vector(50.0, 150.0, 0.0));
     MobilityHelper sm;
     sm.SetPositionAllocator(spa);
     sm.SetMobilityModel("ns3::ConstantPositionMobilityModel");
     sm.Install(g_allNodes.Get(SINK_NODE_ID));
+    
     MobilityHelper senm;
     senm.SetPositionAllocator("ns3::RandomRectanglePositionAllocator", "X", StringValue("ns3::UniformRandomVariable[Min=0|Max=100]"), "Y", StringValue("ns3::UniformRandomVariable[Min=0|Max=100]"));
     senm.SetMobilityModel("ns3::ConstantPositionMobilityModel");
     NodeContainer sensors;
     for (uint32_t i = 0; i < SENSOR_NODES; ++i) sensors.Add(g_allNodes.Get(i));
     senm.Install(sensors);
+    
     for (int i = 0; i < SENSOR_NODES; ++i) g_nodesState[i] = WSNNode();
     ElectClusterHead();
+    
     g_gym = CreateObject<OpenGymInterface>(p);
     g_gym->SetGetObservationSpaceCb(MakeCallback(&GetObservationSpace));
     g_gym->SetGetActionSpaceCb(MakeCallback(&GetActionSpace));
@@ -267,6 +290,7 @@ int main(int argc, char* argv[]) {
     g_gym->SetExecuteActionsCb(MakeCallback(&ExecuteActions));
     g_gym->SetGetGameOverCb(MakeCallback(&GetGameOver));
     g_gym->SetGetExtraInfoCb(MakeCallback(&GetExtraInfo));
+    
     uint32_t rc = 0;
     Simulator::Schedule(MilliSeconds(100), &ScheduleNextStep, 100, rc);
     Simulator::Run();
