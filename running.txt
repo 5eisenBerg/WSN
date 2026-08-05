@@ -619,4 +619,42 @@ Energy (nJ/bit) & 5.861e-01 & 0.1737 & Welch's t-test \\
 \bottomrule
 \end{tabular}
 
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ python3 run_deep_diagnostics.py
+--- 🔬 V71: Running Deep Diagnostic Evaluation ---
+✅ Loaded model '/home/heisenberg/ns3-workspace/rl-agent/training/v68_best.pth'
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+Deep Diagnostic Run: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████▉| 2498/2500 [00:01<00:00, 1485.77it/s]
+✅ Deep diagnostic log saved to 'deep_diagnostic_log.csv'
+
+--- 🔍 Analyzing Deep Diagnostic Log ---
+
+Action Distribution (%):
+action
+1.0    100.0
+Name: proportion, dtype: float64
+
+[CONFIRMED] Agent never selects 'Send HP'.
+
+Q-Value Sanity Check: Agent chose the action with the highest Q-value 100.00% of the time.
+
+[CRITICAL FINDING] Found states where HP queue was full, but agent chose another action.
+Analyzing Q-Values for the first state where HP was ignored:
+s_q_hp      0.033333
+s_q_norm    0.066667
+q_val_0    -0.031109
+q_val_1     0.108010
+q_val_2     0.030767
+q_val_3    -0.122325
+q_val_4    -0.043700
+action      1.000000
+Name: 0, dtype: float64
+/home/heisenberg/ns3-workspace/rl-agent/training/run_deep_diagnostics.py:108: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+  plt.savefig('deep_diagnostic_q_value_dist.png',dpi=300);plt.show()
+
+✅ Q-Value distribution plot generated.
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
