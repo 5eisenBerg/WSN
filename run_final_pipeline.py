@@ -7,17 +7,22 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from math import pi
 
-# --- V68 Config: The Final, Unified Script ---
+# --- V74 Config: The Final, Unified Script ---
 CURRENT_DIR=os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data_v68')
-FIG_DIR = os.path.join(CURRENT_DIR, 'figures_v68')
+DATA_DIR = os.path.join(CURRENT_DIR, 'data_v74')
+FIG_DIR = os.path.join(CURRENT_DIR, 'figures_v74')
 sys.path.append(os.path.join(os.path.dirname(CURRENT_DIR),'networks'));from network import DQN
-NS3_PATH='/home/heisenberg/ns3-workspace/bake/source/ns-3.40';SIM_SCRIPT='wsn_100dynamic';PORT=5555;MODEL_PATH=os.path.join(CURRENT_DIR,"v68_best.pth")
-STATE_SIZE,ACTION_SIZE=6,5;TRAINING_EPOCHS,TRAIN_STEPS_PER_EPOCH,EVAL_STEPS=40,3000,5000
+NS3_PATH='/home/heisenberg/ns3-workspace/bake/source/ns-3.40';SIM_SCRIPT='wsn_100dynamic';PORT=5555;MODEL_PATH=os.path.join(CURRENT_DIR,"v74_best.pth")
+STATE_SIZE,ACTION_SIZE=6,5;TRAINING_EPOCHS,TRAIN_STEPS_PER_EPOCH,EVAL_STEPS=50,5000,5000
 BASE_SEED=12345;VALIDATION_SEEDS=[99991,99992,99993,99994,99995]
-HP_DELIVERY_REWARD,NORMAL_DELIVERY_REWARD,HP_DROP_PENALTY,NORMAL_DROP_PENALTY,HP_TIMEOUT_PENALTY,NORMAL_TIMEOUT_PENALTY=10.0,4.0,-12.0,-4.0,-15.0,-6.0
-HP_LATENCY_PENALTY,NORMAL_LATENCY_PENALTY,ENERGY_PENALTY_WEIGHT,SLEEP_REWARD=-5.0,-1.5,400.0,1.0
-EPSILON_DECAY=0.99992;WARMUP_STEPS=4000
+
+# V74: Final, Balanced, Outcome-Driven Reward Function
+HP_DELIVERY_REWARD=25.0;NORMAL_DELIVERY_REWARD=5.0
+HP_DROP_PENALTY=-40.0;NORMAL_DROP_PENALTY=-8.0
+HP_TIMEOUT_PENALTY=-80.0;NORMAL_TIMEOUT_PENALTY=-10.0
+HP_LATENCY_PENALTY=-40.0;NORMAL_LATENCY_PENALTY=-2.0
+ENERGY_PENALTY_WEIGHT=250.0;SLEEP_REWARD=0.5
+EPSILON_DECAY=0.99995;WARMUP_STEPS=4000
 POLICIES={"Proposed DQN-Edge":"DQN","Strict Priority":"StrictPriority","Random":"Random"}
 ACTION_LABELS=['Send HP','Send Normal','Drop Normal','Sleep','Drop HP']
 METRICS_FOR_STATS={'throughput_kbps':'Throughput (kbps)','pdr_pct':'PDR (%)','avg_hp_delay_s':'Avg. HP Delay (s)','energy_nj_bit':'Energy (nJ/bit)'}
@@ -40,7 +45,7 @@ class PER_DoubleDQNAgent:
         self.model.train();beta=min(1.0,self.beta_start+self.train_steps*(1.0-self.beta_start)/self.beta_frames)
         samples,idx,w=self.memory.sample(128,beta);s,a,r,ns,d=zip(*samples)
         s=torch.FloatTensor(np.array(s));a=torch.LongTensor(a).unsqueeze(1);r=torch.FloatTensor(r).unsqueeze(1);ns=torch.FloatTensor(np.array(ns));d=torch.FloatTensor(d).unsqueeze(1);w=torch.FloatTensor(w).unsqueeze(1)
-        curr_q=self.model(s).gather(1,a)
+        curr_q=self.model(s).gather(1,a);
         with torch.no_grad():next_a=self.model(ns).argmax(1).unsqueeze(1);target_q=r+0.99*self.target(ns).gather(1,next_a)*(1-d)
         td_error=torch.abs(target_q-curr_q);loss=(w*F.smooth_l1_loss(curr_q,target_q,reduction='none')).mean()
         self.optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(self.model.parameters(),1.0);self.optimizer.step();self.scheduler.step()
@@ -54,12 +59,17 @@ class PER_DoubleDQNAgent:
     def load(self,p):
         c=torch.load(p,map_location="cpu");self.model.load_state_dict(c["model"]);self.optimizer.load_state_dict(c["optimizer"]);self.scheduler.load_state_dict(c["scheduler"])
         self.epsilon=c["epsilon"];self.train_steps=c["step"];self.target.load_state_dict(self.model.state_dict())
-def calculate_reward(s,ps,info):
-    reward=info.get('hp_sent',0)*HP_DELIVERY_REWARD+info.get('normal_sent',0)*NORMAL_DELIVERY_REWARD+info.get('hp_dropped',0)*HP_DROP_PENALTY+info.get('normal_dropped',0)*NORMAL_DROP_PENALTY+info.get('hp_timeout',0)*HP_TIMEOUT_PENALTY+info.get('normal_timeout',0)*NORMAL_TIMEOUT_PENALTY
-    reward+=s[4]*HP_LATENCY_PENALTY+s[3]*NORMAL_LATENCY_PENALTY
-    energy_decay=ps[2]-s[2];reward-=energy_decay*ENERGY_PENALTY_WEIGHT if energy_decay>0 else 0
+
+def calculate_reward_v74(s,ps,info):
+    reward = info.get('hp_sent',0)*HP_DELIVERY_REWARD + info.get('normal_sent',0)*NORMAL_DELIVERY_REWARD
+    reward += info.get('hp_dropped',0)*HP_DROP_PENALTY + info.get('normal_dropped',0)*NORMAL_DROP_PENALTY
+    reward += info.get('hp_timeout',0)*HP_TIMEOUT_PENALTY + info.get('normal_timeout',0)*NORMAL_TIMEOUT_PENALTY
+    reward += (s[4]**2)*HP_LATENCY_PENALTY + (s[3]**2)*NORMAL_LATENCY_PENALTY
+    energy_decay=ps[2]-s[2];
+    if energy_decay>0:reward-=energy_decay*ENERGY_PENALTY_WEIGHT
     if info.get('action')==3:reward+=SLEEP_REWARD
-    return reward
+    return np.tanh(reward/100.0) # Adjusted tanh scaling
+
 def run_simulation(policy,steps,train_mode=False,run_id=1,agent=None,seed=BASE_SEED,collect_data=False):
     random.seed(seed);np.random.seed(seed);torch.manual_seed(seed);from ns3gym import ns3env
     cmd=f"./ns3 run '{SIM_SCRIPT} --openGymPort={PORT} --run={run_id}'";p=subprocess.Popen(cmd,cwd=NS3_PATH,shell=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);time.sleep(3)
@@ -83,15 +93,17 @@ def run_simulation(policy,steps,train_mode=False,run_id=1,agent=None,seed=BASE_S
                     else:a=3
             if collect_data:actions_log.append(a)
             s_next,_,d,info_str=env.step(a);info=json.loads(info_str if info_str else'{}');info['action']=a;s_next=np.array(s_next,dtype=np.float32)
-            if train_mode:r=0 if d else calculate_reward(s_next,ps,info);rewards_log.append(r);agent.remember(s,a,r,s_next,d);agent.train()
+            if train_mode:r=0 if d else calculate_reward_v74(s_next,ps,info);rewards_log.append(r);agent.remember(s,a,r,s_next,d);agent.train()
             s=s_next
-            if d:assert "throughput_kbps" in info;final_info=info;break
+            if d:
+                if "throughput_kbps" not in info:raise RuntimeError("Simulator did not return final metrics.")
+                final_info=info;break
         if collect_data:
             os.makedirs(DATA_DIR,exist_ok=True)
             if train_mode:np.savetxt(os.path.join(DATA_DIR,f'reward_log_epoch{run_id}.txt'),rewards_log)
             for fname in ['hp_delays.txt','normal_delays.txt','queue_log.txt','energy_log.txt']:
-                src_path=os.path.join(NS3_PATH,fname)
-                if os.path.exists(src_path):shutil.copy(src_path,os.path.join(DATA_DIR,f'{policy}_{fname}'))
+                src=os.path.join(NS3_PATH,fname);dst=os.path.join(DATA_DIR,f'{policy}_{fname}')
+                if os.path.exists(src):shutil.copy(src,dst)
             np.savetxt(os.path.join(DATA_DIR,f'{policy}_actions.txt'),actions_log,fmt='%d')
         return (final_info,agent)
     finally:
@@ -102,18 +114,19 @@ def run_simulation(policy,steps,train_mode=False,run_id=1,agent=None,seed=BASE_S
         try:p.kill()
         except:pass
         subprocess.run(f"pkill -9 -f {SIM_SCRIPT}",shell=True,check=False);time.sleep(1)
+
 def get_eval_score(res):
-    pdr=res.get('pdr_pct',0);plr=res.get('plr_pct',100);hd=res.get('avg_hp_delay_s',5)
-    return np.clip((0.5*pdr/100.0)+(0.2*(1-plr/100.0))+(0.3*(1-min(hd/2.0,1.0))),0.0,1.0)
+    pdr=res.get('pdr_pct',0);plr=res.get('plr_pct',100);hd=res.get('avg_hp_delay_s',2.0)
+    return np.clip((0.6*pdr/100.0)+(0.1*(1-plr/100.0))+(0.3*(1-min(hd/1.0,1.0))),0.0,1.0) # Score now prioritizes PDR more
 
 def main_experiment():
-    print("🛠️ V68: Rebuilding NS-3...");build=subprocess.run(f"./ns3 build",cwd=NS3_PATH,shell=True,capture_output=True,text=True)
+    print("🛠️ V74: Rebuilding NS-3...");build=subprocess.run(f"./ns3 build",cwd=NS3_PATH,shell=True,capture_output=True,text=True)
     if build.returncode!=0:print(f"❌ Build Fail:\n{build.stderr}");sys.exit(1)
     print("✅ Build OK.")
     if os.path.exists(DATA_DIR):shutil.rmtree(DATA_DIR)
     os.makedirs(DATA_DIR,exist_ok=True)
     training_agent=PER_DoubleDQNAgent();best_eval_score=float("-inf");best_epoch=0;train_log=[]
-    print("\n🧠 V68: Training Final DQN...");
+    print("\n🧠 V74: Training Final DQN...");
     for epoch in range(TRAINING_EPOCHS):
         epoch_seed=BASE_SEED+epoch;print(f"\n--- Epoch {epoch+1}/{TRAINING_EPOCHS} (Seed: {epoch_seed}) ---")
         _,training_agent=run_simulation("DQN",TRAIN_STEPS_PER_EPOCH,True,epoch+1,agent=training_agent,seed=epoch_seed,collect_data=(epoch==0))
@@ -126,15 +139,15 @@ def main_experiment():
         train_log.append({"epoch":epoch+1,"score":mean_score,"epsilon":training_agent.epsilon,"lr":training_agent.optimizer.param_groups[0]['lr'],"buffer":len(training_agent.memory)})
         if mean_score>best_eval_score:best_eval_score=mean_score;best_epoch=epoch;training_agent.save(MODEL_PATH);print(f"  🥇 New best model saved (Score: {best_eval_score:.4f})")
         if epoch-best_epoch>=15:print("--- Early stopping triggered ---");break
-    pd.DataFrame(train_log).to_csv("training_log_v68.csv",index=False)
-    print("\n📊 V68: Final Evaluation...");raw_results=[]
+    pd.DataFrame(train_log).to_csv("training_log_v74.csv",index=False)
+    print("\n📊 V74: Final Evaluation...");raw_results=[]
     for i in range(20):
         run_seed=BASE_SEED+200+i;print(f"\n--- Eval Run {i+1}/20 (Seed: {run_seed}) ---")
         for label,policy in POLICIES.items():
             metrics,_=run_simulation(policy,EVAL_STEPS,False,i+1,seed=run_seed,collect_data=(i==0))
             if metrics:metrics['Policy']=label;metrics['run']=i+1;raw_results.append(metrics)
             else:print(f"Warning: Empty metrics for {label} on run {i+1}")
-    raw_df=pd.DataFrame(raw_results);raw_df.to_csv('raw_results_v68.csv',index=False)
+    raw_df=pd.DataFrame(raw_results);raw_df.to_csv('raw_results_v74.csv',index=False)
     summary_data=[]
     for policy,group in raw_df.groupby('Policy'):
         entry={'Policy':policy}
@@ -143,25 +156,27 @@ def main_experiment():
             mean=group[col].mean();ci=stats.t.ppf(0.975,len(group)-1)*group[col].std(ddof=1)/np.sqrt(len(group))
             entry[col]=f"{mean:.4f}±{ci:.4f}"
         summary_data.append(entry)
-    summary_df=pd.DataFrame(summary_data).set_index('Policy');print("\n\n--- FINAL RESULTS (V68, MEAN ± 95% CI) ---");print(summary_df.to_string())
-    summary_df.to_excel("final_results_v68.xlsx");print("\n✅ Raw and summary results exported.")
+    summary_df=pd.DataFrame(summary_data).set_index('Policy');print("\n\n--- FINAL RESULTS (V74, MEAN ± 95% CI) ---");print(summary_df.to_string())
+    summary_df.to_excel("final_results_v74.xlsx");print("\n✅ Raw and summary results exported.")
 
 def plot_all_figures():
     print("\n\n--- 📈 Generating Publication Plots ---");sns.set_theme(style="whitegrid",palette="muted",font_scale=1.2);os.makedirs(FIG_DIR,exist_ok=True)
     try:
-        raw_df=pd.read_csv('raw_results_v68.csv')
-        log_df=pd.read_csv('training_log_v68.csv')
+        raw_df=pd.read_csv('raw_results_v74.csv')
+        log_df=pd.read_csv('training_log_v74.csv')
     except FileNotFoundError:print("❌ Data files not found. Cannot generate plots.");return
 
     # Fig 1 & 2: Learning and Reward Curves
-    fig,ax1=plt.subplots(figsize=(12,7));ax2=ax1.twinx();ax1.plot(log_df['epoch'],log_df['score'].rolling(5,min_periods=1,center=True).mean(),'b-',label='Validation Score (5-Epoch Avg)',linewidth=3);ax2.plot(log_df['epoch'],log_df['epsilon'],'r--',label='Epsilon Decay',alpha=0.6);ax1.set_xlabel('Training Epoch');ax1.set_ylabel('Validation Score',color='b');ax2.set_ylabel('Epsilon',color='r');best_idx=log_df['score'].idxmax();best_score=log_df['score'].max();best_epoch=log_df['epoch'][best_idx];ax1.axvline(x=best_epoch,color='g',linestyle='--',label=f'Best Model @ Epoch {best_epoch}');ax1.scatter(best_epoch,best_score,color='g',s=150,zorder=5);plt.title('Agent Training Progression',fontsize=18,fontweight='bold');fig.legend(loc="upper right",bbox_to_anchor=(0.9,0.9));plt.tight_layout();plt.savefig(os.path.join(FIG_DIR,'fig_1_learning_curve.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 1: Learning Curve")
-    rewards=np.loadtxt(os.path.join(DATA_DIR,'reward_log_epoch1.txt'));reward_df=pd.DataFrame({'step':range(len(rewards)),'reward':rewards});reward_df['reward_smooth']=reward_df['reward'].rolling(window=100,min_periods=1).mean();plt.figure(figsize=(12,7));plt.plot(reward_df['step'],reward_df['reward_smooth']);plt.title('Per-Step Reward (First Training Epoch)',fontsize=18,fontweight='bold');plt.xlabel('Training Step');plt.ylabel('Smoothed Reward (100-step avg)');plt.savefig(os.path.join(FIG_DIR,'fig_2_reward_curve.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 2: Reward Curve")
+    try:
+        fig,ax1=plt.subplots(figsize=(12,7));ax2=ax1.twinx();ax1.plot(log_df['epoch'],log_df['score'].rolling(5,min_periods=1,center=True).mean(),'b-',label='Validation Score (5-Epoch Avg)',linewidth=3);ax2.plot(log_df['epoch'],log_df['epsilon'],'r--',label='Epsilon Decay',alpha=0.6);ax1.set_xlabel('Training Epoch');ax1.set_ylabel('Validation Score',color='b');ax2.set_ylabel('Epsilon',color='r');best_idx=log_df['score'].idxmax();best_score=log_df['score'].max();best_epoch=log_df['epoch'][best_idx];ax1.axvline(x=best_epoch,color='g',linestyle='--',label=f'Best Model @ Epoch {best_epoch}');ax1.scatter(best_epoch,best_score,color='g',s=150,zorder=5);plt.title('Agent Training Progression',fontsize=18,fontweight='bold');fig.legend(loc="upper right",bbox_to_anchor=(0.9,0.9));plt.tight_layout();plt.savefig(os.path.join(FIG_DIR,'fig_1_learning_curve.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 1: Learning Curve")
+        rewards=np.loadtxt(os.path.join(DATA_DIR,'reward_log_epoch1.txt'));reward_df=pd.DataFrame({'step':range(len(rewards)),'reward':rewards});reward_df['reward_smooth']=reward_df['reward'].rolling(window=100,min_periods=1).mean();plt.figure(figsize=(12,7));plt.plot(reward_df['step'],reward_df['reward_smooth']);plt.title('Per-Step Reward (First Training Epoch)',fontsize=18,fontweight='bold');plt.xlabel('Training Step');plt.ylabel('Smoothed Reward (100-step avg)');plt.savefig(os.path.join(FIG_DIR,'fig_2_reward_curve.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 2: Reward Curve")
+    except Exception as e:print(f"❌ Error in training plots: {e}")
     
     # Fig 3 & 4: Boxplots and Bar Charts
     df_melted=raw_df.melt(id_vars='Policy',value_vars=METRICS_FOR_STATS.keys(),var_name='Metric',value_name='Value');df_melted['Metric']=df_melted['Metric'].map(METRICS_FOR_STATS)
     g=sns.catplot(data=df_melted,kind='box',x='Policy',y='Value',col='Metric',col_wrap=2,height=5,aspect=1.3,sharey=False,order=list(POLICIES.keys()));g.fig.suptitle('Distribution of Performance Metrics (20 Runs)',y=1.03,fontsize=18,fontweight='bold');g.set_axis_labels("","Value");g.set_titles("{col_name}");plt.tight_layout(rect=[0,0,1,0.96]);plt.savefig(os.path.join(FIG_DIR,'fig_3_boxplots.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 3: Boxplots")
-    summary_df=raw_df.groupby('Policy').agg(['mean','std']).reset_index();summary_df.columns=[' '.join(col).strip() for col in summary_df.columns.values];policy_order=list(POLICIES.keys());summary_df=summary_df.set_index('Policy').loc[policy_order].reset_index()
-    g=sns.catplot(data=df_melted,kind='bar',x='Policy',y='Value',col='Metric',col_wrap=2,height=5,aspect=1.3,sharey=False,order=list(POLICIES.keys()),errorbar=None);g.fig.suptitle('Mean Performance Comparison (95% CI)',y=1.03,fontsize=18,fontweight='bold');g.set_axis_labels("","Mean Value");g.set_titles("{col_name}")
+    summary_df_agg=raw_df.groupby('Policy').agg(['mean','std']).reset_index();summary_df_agg.columns=[' '.join(col).strip() for col in summary_df_agg.columns.values];policy_order=list(POLICIES.keys());summary_df_agg=summary_df_agg.set_index('Policy').loc[policy_order].reset_index()
+    g=sns.catplot(data=df_melted,kind='bar',x='Policy',y='Value',col='Metric',col_wrap=2,height=5,aspect=1.3,sharey=False,order=list(POLICIES.keys()),errorbar=None);g.fig.suptitle('Mean Performance Comparison (95% CI)',y=1.03,fontsize=18,fontweight='bold');g.set_axis_labels("","Mean Value");g.set_titles("{col_name}");
     for ax,metric in zip(g.axes.flat,METRICS_FOR_STATS.values()):
         sub_df=df_melted[df_melted['Metric']==metric];means=sub_df.groupby('Policy')['Value'].mean().loc[list(POLICIES.keys())];cis=sub_df.groupby('Policy')['Value'].apply(lambda x:stats.t.ppf(0.975,len(x)-1)*x.std(ddof=1)/np.sqrt(len(x))).loc[list(POLICIES.keys())]
         ax.errorbar(x=range(len(means)),y=means,yerr=cis,fmt='none',c='black',capsize=5)
@@ -201,9 +216,10 @@ def plot_all_figures():
         data=row[metrics_radar].values.flatten().tolist();data+=data[:1];ax.plot(angles,data,linewidth=2,linestyle='solid',label=row['Policy']);ax.fill(angles,data,alpha=0.25)
     plt.title('Multi-Objective Performance Radar Chart',size=20,color='black',y=1.1);plt.legend(loc='upper right',bbox_to_anchor=(0.1,0.1));plt.savefig(os.path.join(FIG_DIR,'fig_8_radar_chart.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 8: Radar Chart")
 
-    # Final Stats Table
+def generate_stats_table():
     print("\n\n--- 📋 Statistical Significance Table ---")
     try:
+        raw_df=pd.read_csv('raw_results_v74.csv')
         dqn_data=raw_df[raw_df['Policy']=='Proposed DQN-Edge'];sp_data=raw_df[raw_df['Policy']=='Strict Priority']
         stats_results=[]
         for metric,name in METRICS_FOR_STATS.items():
@@ -219,3 +235,4 @@ def plot_all_figures():
 if __name__ == "__main__":
     main_experiment()
     plot_all_figures()
+    generate_stats_table()
