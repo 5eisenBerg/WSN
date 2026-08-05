@@ -186,13 +186,16 @@ def plot_all_figures():
     plt.figure(figsize=(12,7))
     for label,p_short in POLICIES.items():
         try:
-            # SAFETY CHECK: If the delays file is completely empty because perfect routing led to 0 delay, populate with a zero so plot doesn't crash.
-            path_hp = os.path.join(DATA_DIR, f'{p_short}_hp_delays.txt')
-            if os.path.exists(path_hp) and os.path.getsize(path_hp) == 0:
-                with open(path_hp, 'w') as f: f.write("0.0\n")
+            path_hp=os.path.join(DATA_DIR,f'{p_short}_hp_delays.txt')
+            if os.path.exists(path_hp) and os.path.getsize(path_hp)==0:
+                with open(path_hp,'w') as f:f.write("0.0\n")
+            # V74 BUG FIX: Use ndmin=1 to ensure loadtxt returns an array
+            hp_delays=np.loadtxt(path_hp,ndmin=1);sns.ecdfplot(hp_delays,label=f'{label} (HP)',linewidth=3)
             
-            hp_delays=np.loadtxt(path_hp);sns.ecdfplot(hp_delays,label=f'{label} (HP)',linewidth=3)
-            normal_delays=np.loadtxt(os.path.join(DATA_DIR,f'{p_short}_normal_delays.txt'));sns.ecdfplot(normal_delays,label=f'{label} (Normal)',linestyle='--',linewidth=3)
+            path_normal=os.path.join(DATA_DIR,f'{p_short}_normal_delays.txt')
+            if os.path.exists(path_normal) and os.path.getsize(path_normal)==0:
+                with open(path_normal,'w') as f:f.write("0.0\n")
+            normal_delays=np.loadtxt(path_normal,ndmin=1);sns.ecdfplot(normal_delays,label=f'{label} (Normal)',linestyle='--',linewidth=3)
         except FileNotFoundError:print(f"⚠️ No delay logs for {label}, skipping in CDF plot.")
     plt.title('CDF of Packet End-to-End Delays',fontsize=18,fontweight='bold');plt.xlabel('Delay (s)');plt.ylabel('Probability (CDF)');plt.legend();plt.grid(True,linestyle=':');plt.xlim(left=0,right=2.5);plt.savefig(os.path.join(FIG_DIR,'fig_5_delay_cdf.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 5: Delay CDF")
     all_q_data=[];
@@ -220,6 +223,8 @@ def plot_all_figures():
         if row['Policy'] not in POLICIES.keys(): continue
         data=row[metrics_radar].values.flatten().tolist();data+=data[:1];ax.plot(angles,data,linewidth=2,linestyle='solid',label=row['Policy']);ax.fill(angles,data,alpha=0.25)
     plt.title('Multi-Objective Performance Radar Chart',size=20,color='black',y=1.1);plt.legend(loc='upper right',bbox_to_anchor=(0.1,0.1));plt.savefig(os.path.join(FIG_DIR,'fig_8_radar_chart.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 8: Radar Chart")
+
+
 
 def generate_stats_table():
     print("\n\n--- 📋 Statistical Significance Table ---")
