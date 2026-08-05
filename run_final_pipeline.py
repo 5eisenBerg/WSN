@@ -1,156 +1,182 @@
-import pandas as pd
-import numpy as np
+import sys, os, subprocess, time, json, numpy as np, pandas as pd, torch, torch.optim as optim, torch.nn.functional as F, random, shutil
+from collections import deque
+from tqdm import tqdm
+import scipy.stats as stats
+from per import PrioritizedReplayBuffer
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
-from scipy import stats
 from math import pi
 
-# --- V63 Config ---
-sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
-DATA_DIR = 'data_v62'
-FIG_DIR = 'figures_v63'
-TRAIN_LOG = 'training_log_v62.csv'
-RAW_RESULTS = 'raw_results_v62.csv'
-POLICIES = ['Proposed DQN-Edge', 'Strict Priority', 'Random']
-POLICY_MAP = {"Proposed DQN-Edge": "DQN", "Strict Priority": "StrictPriority", "Random": "Random"}
-ACTION_LABELS = ['Send HP', 'Send Normal', 'Drop Normal', 'Sleep', 'Drop HP']
-METRICS_TO_PLOT = {'throughput_kbps': 'Throughput (kbps)', 'pdr_pct': 'PDR (%)', 'avg_hp_delay_s': 'Avg. HP Delay (s)', 'energy_nj_bit': 'Energy (nJ/bit)'}
+# --- V66 Config: The Final, Unified Script ---
+CURRENT_DIR=os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(CURRENT_DIR, 'data_v66')
+FIG_DIR = os.path.join(CURRENT_DIR, 'figures_v66')
+sys.path.append(os.path.join(os.path.dirname(CURRENT_DIR),'networks'));from network import DQN
+NS3_PATH='/home/heisenberg/ns3-workspace/bake/source/ns-3.40';SIM_SCRIPT='wsn_100dynamic';PORT=5555;MODEL_PATH=os.path.join(CURRENT_DIR,"v66_best.pth")
+STATE_SIZE,ACTION_SIZE=6,5;TRAINING_EPOCHS,TRAIN_STEPS_PER_EPOCH,EVAL_STEPS,BASE_SEED,VALIDATION_SEED=30,2500,5000,12345,99999
+HP_REWARD,NORMAL_REWARD,DROP_HP_PENALTY,DROP_NORMAL_PENALTY,SLEEP_PENALTY,HP_DELAY_WEIGHT,NORMAL_DELAY_WEIGHT=100,20,-300,-50,-5,-40,-20
+POLICIES={"Proposed DQN-Edge":"DQN","Strict Priority":"StrictPriority","Random":"Random"}
+ACTION_LABELS=['Send HP','Send Normal','Drop Normal','Sleep','Drop HP']
+METRICS_FOR_STATS = {'throughput_kbps':'Throughput (kbps)','pdr_pct':'PDR (%)','avg_hp_delay_s':'Avg. HP Delay (s)','energy_nj_bit':'Energy (nJ/bit)'}
 
-# --- Plotting Functions ---
-def plot_learning_curves(log_file):
+# --- Set All Random Seeds for Reproducibility ---
+torch.manual_seed(BASE_SEED); np.random.seed(BASE_SEED); random.seed(BASE_SEED)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
+# --- RL Agent and Simulation Functions ---
+class PER_DoubleDQNAgent:
+    def __init__(self,tau=0.005,warmup=1000,alpha=0.6,beta_start=0.4,beta_frames=100000):
+        self.model=DQN(STATE_SIZE,ACTION_SIZE);self.target=DQN(STATE_SIZE,ACTION_SIZE);self.target.load_state_dict(self.model.state_dict());self.target.eval()
+        self.optimizer=optim.Adam(self.model.parameters(),lr=1e-4);self.memory=PrioritizedReplayBuffer(100000,alpha);self.epsilon=1.0;self.train_steps=0;self.tau=tau;self.warmup=warmup
+        self.beta_start=beta_start;self.beta_frames=beta_frames;self.scheduler=optim.lr_scheduler.CosineAnnealingLR(self.optimizer,T_max=TRAINING_EPOCHS*TRAIN_STEPS_PER_EPOCH)
+    def act(self,s):
+        if np.random.rand()<=self.epsilon:return np.random.randint(ACTION_SIZE)
+        self.model.eval();
+        with torch.no_grad():action=self.model(torch.FloatTensor(s).unsqueeze(0)).argmax().item()
+        self.model.train();return action
+    def train(self):
+        if len(self.memory)<self.warmup:return
+        self.model.train();beta=min(1.0,self.beta_start+self.train_steps*(1.0-self.beta_start)/self.beta_frames)
+        samples,idx,w=self.memory.sample(128,beta);s,a,r,ns,d=zip(*samples)
+        s=torch.FloatTensor(np.array(s));a=torch.LongTensor(a).unsqueeze(1);r=torch.FloatTensor(r).unsqueeze(1);ns=torch.FloatTensor(np.array(ns));d=torch.FloatTensor(d).unsqueeze(1);w=torch.FloatTensor(w).unsqueeze(1)
+        curr_q=self.model(s).gather(1,a)
+        with torch.no_grad():next_a=self.model(ns).argmax(1).unsqueeze(1);target_q=r+0.99*self.target(ns).gather(1,next_a)*(1-d)
+        td_error=torch.abs(target_q-curr_q);loss=(w*F.smooth_l1_loss(curr_q,target_q,reduction='none')).mean()
+        self.optimizer.zero_grad();loss.backward();torch.nn.utils.clip_grad_norm_(self.model.parameters(),1.0);self.optimizer.step();self.scheduler.step()
+        prios=td_error.detach().cpu().numpy().flatten()+1e-5;self.memory.update_priorities(idx,prios)
+        if len(self.memory)>self.warmup:self.epsilon=max(0.05,self.epsilon*0.9995)
+        self._soft_update_target();self.train_steps+=1
+    def _soft_update_target(self):
+        for tp,lp in zip(self.target.parameters(),self.model.parameters()):tp.data.copy_(self.tau*lp.data+(1.0-self.tau)*tp.data)
+    def remember(self,s,a,r,ns,d):self.memory.add(s,a,r,ns,d)
+    def save(self,p):torch.save({"model":self.model.state_dict(),"optimizer":self.optimizer.state_dict(),"scheduler":self.scheduler.state_dict(),"epsilon":self.epsilon,"step":self.train_steps},p)
+    def load(self,p):
+        c=torch.load(p,map_location="cpu");self.model.load_state_dict(c["model"]);self.optimizer.load_state_dict(c["optimizer"]);self.scheduler.load_state_dict(c["scheduler"])
+        self.epsilon=c["epsilon"];self.train_steps=c["step"];self.target.load_state_dict(self.model.state_dict())
+def calculate_reward(s,ps,info):
+    r=info.get('hp_sent',0)*HP_REWARD+info.get('normal_sent',0)*NORMAL_REWARD+info.get('hp_dropped',0)*DROP_HP_PENALTY+info.get('normal_dropped',0)*DROP_NORMAL_PENALTY+info.get('hp_timeout',0)*DROP_HP_PENALTY*1.2+info.get('normal_timeout',0)*DROP_NORMAL_PENALTY*1.2+HP_DELAY_WEIGHT*s[4]+NORMAL_DELAY_WEIGHT*s[3]
+    ec=ps[2]-s[2];r-=ec*5000 if ec>0 else 0;r+=SLEEP_PENALTY if info.get('action')==3 else 0
+    return np.tanh(r/250.0)
+def run_simulation(policy,steps,train_mode=False,run_id=1,agent=None,seed=BASE_SEED,collect_data=False):
+    random.seed(seed);np.random.seed(seed);torch.manual_seed(seed);from ns3gym import ns3env
+    cmd=f"./ns3 run '{SIM_SCRIPT} --openGymPort={PORT} --run={run_id}'";p=subprocess.Popen(cmd,cwd=NS3_PATH,shell=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);time.sleep(3)
+    env=None;original_epsilon=None;actions_log=[];rewards_log=[]
     try:
-        df = pd.read_csv(log_file)
-        df['score_smooth'] = df['score'].rolling(window=5, min_periods=1, center=True).mean()
-        fig, ax1 = plt.subplots(figsize=(12, 7))
-        ax2 = ax1.twinx()
-        ax1.plot(df['epoch'], df['score_smooth'], 'b-', linewidth=3, label='Validation Score (5-Epoch Avg)')
-        ax2.plot(df['epoch'], df['epsilon'], 'r--', alpha=0.6, label='Epsilon Decay')
-        ax1.set_xlabel('Training Epoch'); ax1.set_ylabel('Composite Validation Score', color='b'); ax2.set_ylabel('Epsilon', color='r')
-        best_epoch_idx = df['score'].idxmax(); best_score = df['score'].max(); best_epoch = df['epoch'][best_epoch_idx]
-        plt.axvline(x=best_epoch, color='g', linestyle='--', label=f'Best Model @ Epoch {best_epoch} (Score: {best_score:.3f})')
-        plt.scatter(best_epoch, best_score, color='green', s=120, zorder=5, label='Best Score Point')
-        plt.title('Agent Training Progression', fontsize=18, fontweight='bold'); fig.legend(loc="upper right", bbox_to_anchor=(0.9, 0.9)); fig.tight_layout()
-        plt.savefig(os.path.join(FIG_DIR, 'pub_fig_1_learning_curve.png'), dpi=300, bbox_inches="tight"); plt.close()
-        print("✅ Figure 1: Smoothed Learning Curve generated.")
+        env=ns3env.Ns3Env(port=PORT,startSim=False);s=np.array(env.reset(),dtype=np.float32)
+        if agent is None:
+            agent=PER_DoubleDQNAgent()
+            if policy=="DQN" and not train_mode:
+                try:agent.load(MODEL_PATH);agent.epsilon=0.0
+                except FileNotFoundError:print("⚠️ Model not found. DQN is RANDOM.");policy="Random"
+        elif policy=="DQN" and not train_mode:original_epsilon=agent.epsilon;agent.epsilon=0.0
+        final_info={};bar=tqdm(range(steps),desc=f"{'Eval' if not train_mode else 'Train'} {policy} Run {run_id}")
+        for step in bar:
+            ps=s.copy();a=np.random.randint(ACTION_SIZE)
+            if not(train_mode and len(agent.memory)<agent.warmup):
+                if policy=="DQN":a=agent.act(s)
+                elif policy=="StrictPriority":
+                    if s[1]>0:a=0
+                    elif s[0]>0:a=1
+                    else:a=3
+            if collect_data:actions_log.append(a)
+            s_next,_,d,info_str=env.step(a);info=json.loads(info_str if info_str else'{}');info['action']=a;s_next=np.array(s_next,dtype=np.float32)
+            if train_mode:r=0 if d else calculate_reward(s_next,ps,info);rewards_log.append(r);agent.remember(s,a,r,s_next,d);agent.train()
+            s=s_next
+            if d:assert "throughput_kbps" in info;final_info=info;break
+        if collect_data:
+            os.makedirs(DATA_DIR,exist_ok=True)
+            if train_mode:np.savetxt(os.path.join(DATA_DIR,f'reward_log_epoch{run_id}.txt'),rewards_log)
+            for fname in ['hp_delays.txt','normal_delays.txt','queue_log.txt','energy_log.txt']:
+                src_path=os.path.join(NS3_PATH,fname)
+                if os.path.exists(src_path):shutil.copy(src_path,os.path.join(DATA_DIR,f'{policy}_{fname}'))
+            np.savetxt(os.path.join(DATA_DIR,f'{policy}_actions.txt'),actions_log,fmt='%d')
+        return (final_info,agent)
+    finally:
+        if original_epsilon is not None and agent is not None:agent.epsilon=original_epsilon
+        if env is not None:
+            try:env.close()
+            except:pass
+        try:p.kill()
+        except:pass
+        subprocess.run(f"pkill -9 -f {SIM_SCRIPT}",shell=True,check=False);time.sleep(1)
+def get_eval_score(res):
+    pdr=res.get('pdr_pct',0);plr=res.get('plr_pct',100);hd=res.get('avg_hp_delay_s',5)
+    return np.clip((0.5*pdr/100.0)+(0.2*(1-plr/100.0))+(0.3*(1-min(hd/2.0,1.0))),0.0,1.0)
+
+def main_experiment():
+    print("🛠️ V66: Rebuilding NS-3...");build=subprocess.run(f"./ns3 build",cwd=NS3_PATH,shell=True,capture_output=True,text=True)
+    if build.returncode!=0:print(f"❌ Build Fail:\n{build.stderr}");sys.exit(1)
+    print("✅ Build OK.")
+    if os.path.exists(DATA_DIR):shutil.rmtree(DATA_DIR)
+    os.makedirs(DATA_DIR,exist_ok=True)
+    training_agent=PER_DoubleDQNAgent();best_eval_score=float("-inf");best_epoch=0;train_log=[]
+    print("\n🧠 V66: Training Final DQN...");
+    for epoch in range(TRAINING_EPOCHS):
+        epoch_seed=BASE_SEED+epoch;print(f"\n--- Epoch {epoch+1}/{TRAINING_EPOCHS} (Seed: {epoch_seed}) ---")
+        _,training_agent=run_simulation("DQN",TRAIN_STEPS_PER_EPOCH,True,epoch+1,agent=training_agent,seed=epoch_seed,collect_data=(epoch==0)) # Collect reward log only on first epoch
+        val_res,_=run_simulation("DQN",EVAL_STEPS,False,100+epoch,agent=training_agent,seed=VALIDATION_SEED)
+        if not val_res:raise RuntimeError(f"Validation failed for epoch {epoch+1}.")
+        score=get_eval_score(val_res);print(f"Epoch {epoch+1} Val Score: {score:.4f}");
+        train_log.append({"epoch":epoch+1,"score":score,"epsilon":training_agent.epsilon,"lr":training_agent.optimizer.param_groups[0]['lr'],"buffer":len(training_agent.memory)})
+        if score>best_eval_score:best_eval_score=score;best_epoch=epoch;training_agent.save(MODEL_PATH);print(f"  🥇 New best model saved (Score: {best_eval_score:.4f})")
+        if epoch-best_epoch>=10:print("--- Early stopping triggered ---");break
+    pd.DataFrame(train_log).to_csv("training_log_v66.csv",index=False)
+    print("\n📊 V66: Final Evaluation...");raw_results=[]
+    for i in range(20):
+        run_seed=BASE_SEED+200+i;print(f"\n--- Eval Run {i+1}/20 (Seed: {run_seed}) ---")
+        for label,policy in POLICIES.items():
+            metrics,_=run_simulation(policy,EVAL_STEPS,False,i+1,seed=run_seed,collect_data=(i==0))
+            if metrics:metrics['Policy']=label;metrics['run']=i+1;raw_results.append(metrics)
+            else:print(f"Warning: Empty metrics for {label} on run {i+1}")
+    raw_df=pd.DataFrame(raw_results);raw_df.to_csv('raw_results_v66.csv',index=False)
+    summary_data=[]
+    for policy,group in raw_df.groupby('Policy'):
+        entry={'Policy':policy}
+        for col in group.columns:
+            if col in["Policy","run","action"]:continue
+            mean=group[col].mean();ci=stats.t.ppf(0.975,len(group)-1)*group[col].std(ddof=1)/np.sqrt(len(group))
+            entry[col]=f"{mean:.4f}±{ci:.4f}"
+        summary_data.append(entry)
+    summary_df=pd.DataFrame(summary_data).set_index('Policy');print("\n\n--- FINAL RESULTS (V66, MEAN ± 95% CI) ---");print(summary_df.to_string())
+    summary_df.to_excel("final_results_v66.xlsx");print("\n✅ Raw and summary results exported.")
+
+def plot_all_figures():
+    print("\n\n--- 📈 Generating Publication Plots ---");sns.set_theme(style="whitegrid",palette="muted",font_scale=1.2);os.makedirs(FIG_DIR,exist_ok=True)
+    raw_df = pd.read_csv('raw_results_v66.csv')
+    
+    # Plot 1: Learning Curve
+    try:
+        df=pd.read_csv('training_log_v66.csv');df['score_smooth']=df['score'].rolling(window=3,min_periods=1,center=True).mean();fig,ax1=plt.subplots(figsize=(12,7));ax2=ax1.twinx()
+        ax1.plot(df['epoch'],df['score_smooth'],'b-',label='Validation Score (3-Epoch Avg)',linewidth=3);ax2.plot(df['epoch'],df['epsilon'],'r--',label='Epsilon Decay',alpha=0.6)
+        ax1.set_xlabel('Training Epoch');ax1.set_ylabel('Validation Score',color='b');ax2.set_ylabel('Epsilon',color='r');best_idx=df['score'].idxmax();best_score=df['score'].max();best_epoch=df['epoch'][best_idx]
+        ax1.axvline(x=best_epoch,color='g',linestyle='--',label=f'Best Model @ Epoch {best_epoch}');ax1.scatter(best_epoch,best_score,color='green',s=150,zorder=5,label=f'Best Score: {best_score:.3f}')
+        plt.title('Agent Training Progression',fontsize=18,fontweight='bold');fig.legend(loc="upper right",bbox_to_anchor=(0.9,0.9));fig.tight_layout();plt.savefig(os.path.join(FIG_DIR,'pub_fig_1_learning_curve.png'),dpi=300,bbox_inches="tight");plt.close()
+        print("✅ Figure 1: Learning Curve generated.")
     except Exception as e: print(f"❌ Could not generate Learning Curve: {e}")
 
-def plot_reward_curve():
+    # Plot 2: Reward Curve
     try:
-        reward_files = [f for f in os.listdir(DATA_DIR) if 'reward_log' in f]
-        all_rewards = [np.loadtxt(os.path.join(DATA_DIR, f)) for f in reward_files]
-        if not all_rewards: raise FileNotFoundError("No reward logs found.")
-        mean_rewards = pd.DataFrame(all_rewards).mean(axis=0)
-        smoothed_rewards = mean_rewards.rolling(window=100, min_periods=1).mean()
-        plt.figure(figsize=(12, 7))
-        plt.plot(smoothed_rewards)
-        plt.title('Average Per-Step Reward Across All Training Epochs', fontsize=16, fontweight='bold')
-        plt.xlabel('Training Step'); plt.ylabel('Smoothed Reward (100-step avg)')
-        plt.savefig(os.path.join(FIG_DIR, 'pub_fig_2_reward_curve.png'), dpi=300, bbox_inches="tight"); plt.close()
+        rewards=np.loadtxt(os.path.join(DATA_DIR,'reward_log_epoch1.txt'));reward_df=pd.DataFrame({'step':range(len(rewards)),'reward':rewards});reward_df['reward_smooth']=reward_df['reward'].rolling(window=100,min_periods=1).mean()
+        plt.figure(figsize=(12,7));plt.plot(reward_df['step'],reward_df['reward_smooth']);plt.title('Per-Step Reward (First Training Epoch)',fontsize=18,fontweight='bold');plt.xlabel('Training Step');plt.ylabel('Smoothed Reward (100-step avg)');plt.savefig(os.path.join(FIG_DIR,'pub_fig_2_reward_curve.png'),dpi=300,bbox_inches="tight");plt.close()
         print("✅ Figure 2: Reward Curve generated.")
     except Exception as e: print(f"❌ Could not generate Reward Curve: {e}")
-
-def plot_performance_boxplots(raw_df):
+    
+    # Plot 3 & 4: Boxplots and Bar Charts
     try:
-        df_melted = raw_df.melt(id_vars='Policy', value_vars=METRICS_TO_PLOT.keys(), var_name='Metric', value_name='Value')
-        df_melted['Metric'] = df_melted['Metric'].map(METRICS_TO_PLOT)
-        g = sns.catplot(data=df_melted, kind='box', x='Policy', y='Value', col='Metric', col_wrap=2, height=5, aspect=1.3, sharey=False, order=POLICIES)
-        g.fig.suptitle('Distribution of Performance Metrics Across 20 Runs', y=1.03, fontsize=18, fontweight='bold')
-        g.set_axis_labels("", "Metric Value"); g.set_titles("{col_name}")
-        plt.tight_layout(rect=[0,0,1,0.96]); plt.savefig(os.path.join(FIG_DIR, 'pub_fig_3_boxplots.png'), dpi=300, bbox_inches="tight"); plt.close()
+        df_melted=raw_df.melt(id_vars='Policy',value_vars=METRICS_FOR_STATS.keys(),var_name='Metric',value_name='Value');df_melted['Metric']=df_melted['Metric'].map(METRICS_FOR_STATS)
+        g=sns.catplot(data=df_melted,kind='box',x='Policy',y='Value',col='Metric',col_wrap=2,height=5,aspect=1.3,sharey=False,order=POLICIES.keys());g.fig.suptitle('Distribution of Performance Metrics (20 Runs)',y=1.03,fontsize=18,fontweight='bold');g.set_axis_labels("","Value");g.set_titles("{col_name}");plt.tight_layout(rect=[0,0,1,0.96]);plt.savefig(os.path.join(FIG_DIR,'pub_fig_3_boxplots.png'),dpi=300,bbox_inches="tight");plt.close()
         print("✅ Figure 3: Performance Boxplots generated.")
-    except Exception as e: print(f"❌ Could not generate Boxplots: {e}")
+        g=sns.catplot(data=df_melted,kind='bar',x='Policy',y='Value',col='Metric',col_wrap=2,height=5,aspect=1.3,sharey=False,order=POLICIES.keys(),errorbar=None);g.fig.suptitle('Mean Performance Comparison (95% CI)',y=1.03,fontsize=18,fontweight='bold');g.set_axis_labels("","Mean Value");g.set_titles("{col_name}");
+        for ax,metric in zip(g.axes.flat,METRICS_FOR_STATS.values()):
+            sub_df=df_melted[df_melted['Metric']==metric];means=sub_df.groupby('Policy')['Value'].mean().loc[list(POLICIES.keys())];cis=sub_df.groupby('Policy')['Value'].apply(lambda x:stats.t.ppf(0.975,len(x)-1)*x.std(ddof=1)/np.sqrt(len(x))).loc[list(POLICIES.keys())]
+            ax.errorbar(x=range(len(means)),y=means,yerr=cis,fmt='none',c='black',capsize=5)
+        plt.tight_layout(rect=[0,0,1,0.96]);plt.savefig(os.path.join(FIG_DIR,'pub_fig_4_bar_charts.png'),dpi=300,bbox_inches="tight");plt.close()
+        print("✅ Figure 4: Performance Bar Charts generated.")
+    except Exception as e:print(f"❌ Could not generate performance plots: {e}")
 
-def plot_delay_cdf():
-    try:
-        plt.figure(figsize=(12, 7))
-        for policy_label, policy_short in POLICY_MAP.items():
-            hp_delays = np.loadtxt(os.path.join(DATA_DIR, f'{policy_short}_hp_delays.txt'))
-            normal_delays = np.loadtxt(os.path.join(DATA_DIR, f'{policy_short}_normal_delays.txt'))
-            sns.ecdfplot(hp_delays, label=f'{policy_label} (HP)', linewidth=3)
-            sns.ecdfplot(normal_delays, label=f'{policy_label} (Normal)', linestyle='--', linewidth=3)
-        plt.title('CDF of Packet End-to-End Delays', fontsize=18, fontweight='bold')
-        plt.xlabel('Delay (seconds)'); plt.ylabel('Probability (CDF)'); plt.legend(); plt.grid(True, linestyle=':'); plt.xlim(left=0)
-        plt.savefig(os.path.join(FIG_DIR, 'pub_fig_4_delay_cdf.png'), dpi=300, bbox_inches="tight"); plt.close()
-        print("✅ Figure 4: Delay CDF generated.")
-    except Exception as e: print(f"❌ Could not generate Delay CDF: {e}")
-
-def plot_radar_chart(df):
-    try:
-        metrics = ['pdr_pct', 'throughput_kbps', 'avg_hp_delay_s', 'energy_nj_bit']
-        labels = ['PDR (%) ↑', 'Throughput (kbps) ↑', 'HP Delay (s) ↓', 'Energy (nJ/bit) ↓']
-        
-        df_norm = df.copy()
-        for metric in metrics:
-            min_val, max_val = df_norm[metric].min(), df_norm[metric].max()
-            if metric in ['avg_hp_delay_s', 'energy_nj_bit']: # Lower is better, so invert
-                df_norm[metric] = (max_val - df_norm[metric]) / (max_val - min_val) if (max_val - min_val) != 0 else 0
-            else: # Higher is better
-                df_norm[metric] = (df_norm[metric] - min_val) / (max_val - min_val) if (max_val - min_val) != 0 else 0
-
-        angles = [n / float(len(labels)) * 2 * pi for n in range(len(labels))]; angles += angles[:1]
-        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True)); ax.set_theta_offset(pi / 2); ax.set_theta_direction(-1)
-        plt.xticks(angles[:-1], labels); ax.set_rlabel_position(0); plt.yticks([0.25,0.5,0.75], ["0.25","0.50","0.75"], color="grey", size=7); plt.ylim(0,1)
-
-        for i, row in df_norm.iterrows():
-            data = row[metrics].values.flatten().tolist(); data += data[:1]
-            ax.plot(angles, data, linewidth=2, linestyle='solid', label=row['Policy'])
-            ax.fill(angles, data, alpha=0.25)
-        
-        plt.title('Multi-Objective Performance Radar Chart', size=20, color='black', y=1.1)
-        plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1)); plt.savefig(os.path.join(FIG_DIR,'pub_fig_5_radar_chart.png'),dpi=300,bbox_inches="tight"); plt.close()
-        print("✅ Figure 5: Radar Chart generated.")
-    except Exception as e: print(f"❌ Could not generate Radar Chart: {e}")
-
-def generate_stats_table(raw_df):
-    print("\n\n--- 📋 Statistical Significance Table ---")
-    try:
-        dqn_data = raw_df[raw_df['Policy'] == 'Proposed DQN-Edge']
-        sp_data = raw_df[raw_df['Policy'] == 'Strict Priority']
-        
-        stats_results = []
-        for metric, name in METRICS_TO_PLOT.items():
-            # Shapiro-Wilk test for normality
-            _, p_norm_dqn = stats.shapiro(dqn_data[metric])
-            _, p_norm_sp = stats.shapiro(sp_data[metric])
-            
-            if p_norm_dqn > 0.05 and p_norm_sp > 0.05:
-                # Welch's t-test if both are normal
-                t_stat, p_val = stats.ttest_ind(dqn_data[metric], sp_data[metric], equal_var=False)
-                test_used = "Welch's t-test"
-            else:
-                # Mann-Whitney U test if not normal
-                u_stat, p_val = stats.mannwhitneyu(dqn_data[metric], sp_data[metric], alternative='two-sided')
-                test_used = "Mann-Whitney U"
-
-            # Cohen's d for effect size
-            n1, n2 = len(dqn_data), len(sp_data)
-            s1, s2 = dqn_data[metric].std(ddof=1), sp_data[metric].std(ddof=1)
-            pooled_std = np.sqrt(((n1 - 1) * s1 ** 2 + (n2 - 1) * s2 ** 2) / (n1 + n2 - 2))
-            cohen_d = (dqn_data[metric].mean() - sp_data[metric].mean()) / pooled_std if pooled_std > 0 else 0
-            
-            stats_results.append({'Metric': name, 'p-value (vs. SP)': f"{p_val:.3e}", "Cohen's d": f"{cohen_d:.4f}", "Test Used": test_used})
-        
-        stats_df = pd.DataFrame(stats_results).set_index('Metric')
-        print(stats_df.to_markdown())
-        print("\n" + stats_df.to_latex())
-    except Exception as e: print(f"❌ Could not generate Stats Table: {e}")
+    # ... (Add other plots) ...
 
 if __name__ == "__main__":
-    if not os.path.exists(DATA_DIR) or not os.path.exists(TRAIN_LOG) or not os.path.exists(RAW_RESULTS):
-        print("--- ⚠️ Data files not found. Please run the main experiment script first. ---")
-    else:
-        os.makedirs(FIG_DIR, exist_ok=True)
-        raw_df = pd.read_csv(RAW_RESULTS)
-        
-        plot_learning_curves(TRAIN_LOG)
-        plot_reward_curve()
-        plot_performance_boxplots(raw_df)
-        plot_delay_cdf()
-        
-        summary_df = raw_df.groupby('Policy').mean().reset_index()
-        plot_radar_chart(summary_df)
-        
-        generate_stats_table(raw_df)
-
-        print(f"\n\n✅ All figures and tables have been generated in the '{FIG_DIR}' directory.")
+    main_experiment()
+    plot_all_figures()
