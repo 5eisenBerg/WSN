@@ -3,9 +3,11 @@ from tqdm import tqdm
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# --- V71 Diagnostic Config ---
+# --- V74 Diagnostic Config ---
 CURRENT_DIR=os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(os.path.dirname(CURRENT_DIR),'networks'));from network import DQN
+# V74: Add network path to import the DQN class
+sys.path.append(os.path.join(os.path.dirname(CURRENT_DIR),'networks'))
+from network import DQN
 NS3_PATH='/home/heisenberg/ns3-workspace/bake/source/ns-3.40';SIM_SCRIPT='wsn_100dynamic';PORT=5555
 MODEL_PATH=os.path.join(CURRENT_DIR,"v68_best.pth") # Use the best model from the last run
 STATE_SIZE,ACTION_SIZE=6,5;EVAL_STEPS=2500;SEED=12545
@@ -38,12 +40,12 @@ class DiagnosticDQNAgent:
         c=torch.load(p,map_location="cpu");self.model.load_state_dict(c["model"])
 
 def run_deep_diagnostic():
-    print("--- 🔬 V71: Running Deep Diagnostic Evaluation ---")
+    print("--- 🔬 V74: Running Deep Diagnostic Evaluation ---")
     agent=DiagnosticDQNAgent();
-    try:agent.load(MODEL_PATH);print(f"✅ Loaded model '{MODEL_PATH}'")
-    except FileNotFoundError:print(f"❌ CRITICAL: Model file not found at '{MODEL_PATH}'.");return
+    try:agent.load(MODEL_PATH);print(f"✅ Successfully loaded model from '{MODEL_PATH}'")
+    except FileNotFoundError:print(f"❌ CRITICAL: Model file not found at '{MODEL_PATH}'. Cannot run diagnostic.");return None
 
-    cmd=f"./ns3 run '{SIM_SCRIPT} --openGymPort={PORT} --run=71'";p=subprocess.Popen(cmd,cwd=NS3_PATH,shell=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);time.sleep(3)
+    cmd=f"./ns3 run '{SIM_SCRIPT} --openGymPort={PORT} --run=74'";p=subprocess.Popen(cmd,cwd=NS3_PATH,shell=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL);time.sleep(3)
     env=None;diagnostic_log=[]
     try:
         from ns3gym import ns3env
@@ -55,7 +57,6 @@ def run_deep_diagnostic():
             s_next,_,d,info_str=env.step(action)
             info=json.loads(info_str if info_str else'{}');s_next=np.array(s_next,dtype=np.float32)
             
-            # Log everything: state, Q-values, action, and resulting reward
             calculated_reward=calculate_reward_v68(s_next,prev_s,info,action)
             log_entry=np.concatenate([prev_s,q_values,[action,calculated_reward]])
             diagnostic_log.append(log_entry)
@@ -65,8 +66,8 @@ def run_deep_diagnostic():
         
         columns=['s_q_norm','s_q_hp','s_energy','s_age_norm','s_age_hp','s_neighbors']+['q_val_0','q_val_1','q_val_2','q_val_3','q_val_4']+['action','reward']
         log_df=pd.DataFrame(diagnostic_log,columns=columns)
-        log_df.to_csv("deep_diagnostic_log.csv",index=False)
-        print("✅ Deep diagnostic log saved to 'deep_diagnostic_log.csv'")
+        log_df.to_csv("deep_diagnostic_log_v74.csv",index=False)
+        print("✅ Deep diagnostic log saved to 'deep_diagnostic_log_v74.csv'")
         return log_df
     finally:
         if env is not None:
@@ -79,19 +80,16 @@ def run_deep_diagnostic():
 def analyze_deep_diagnostic(df):
     print("\n--- 🔍 Analyzing Deep Diagnostic Log ---")
     
-    # 1. Confirm the policy collapse
     action_dist=df['action'].value_counts(normalize=True)*100
     print("\nAction Distribution (%):");print(action_dist)
     if action_dist.get(0,0)==0:
         print("\n[CONFIRMED] Agent never selects 'Send HP'.")
     
-    # 2. Analyze Q-Values: WHY does it always choose Action 1?
     q_cols=['q_val_0','q_val_1','q_val_2','q_val_3','q_val_4']
     df['best_action_by_q']=df[q_cols].idxmax(axis=1).str.replace('q_val_','').astype(int)
     q_value_consistency=(df['action']==df['best_action_by_q']).mean()*100
     print(f"\nQ-Value Sanity Check: Agent chose the action with the highest Q-value {q_value_consistency:.2f}% of the time.")
     
-    # 3. Find states where the choice was "wrong" but Q-values insisted
     wrong_choice_df=df[(df['s_q_hp']>0)&(df['action']!=0)]
     if not wrong_choice_df.empty:
         print("\n[CRITICAL FINDING] Found states where HP queue was full, but agent chose another action.")
@@ -99,16 +97,21 @@ def analyze_deep_diagnostic(df):
         state_to_analyze=wrong_choice_df.iloc[0]
         print(state_to_analyze[['s_q_hp','s_q_norm','q_val_0','q_val_1','q_val_2','q_val_3','q_val_4','action']])
         
-        # Plot Q-value evolution
         plt.figure(figsize=(14,7))
         for i,label in enumerate(ACTION_LABELS):
-            sns.kdeplot(df[f'q_val_{i}'],label=label,linewidth=2)
+            sns.kdeplot(df[f'q_val_{i}'],label=label,linewidth=2.5,fill=True,alpha=0.2)
         plt.title('Distribution of Predicted Q-Values For Each Action',fontsize=16,fontweight='bold')
-        plt.xlabel('Predicted Q-Value');plt.legend();
-        plt.savefig('deep_diagnostic_q_value_dist.png',dpi=300);plt.show()
+        plt.xlabel('Predicted Q-Value (Expected Future Reward)');plt.legend();
+        plt.savefig('deep_diagnostic_q_value_dist_v74.png',dpi=300,bbox_inches="tight");plt.show();plt.close()
         print("\n✅ Q-Value distribution plot generated.")
 
 if __name__ == "__main__":
+    try:
+        import ns3gym
+    except ImportError:
+        print("❌ ns3gym not found. Please install it using 'pip install ns3gym'")
+        sys.exit(1)
+        
     log_df = run_deep_diagnostic()
     if log_df is not None:
         analyze_deep_diagnostic(log_df)
