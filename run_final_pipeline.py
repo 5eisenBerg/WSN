@@ -186,7 +186,12 @@ def plot_all_figures():
     plt.figure(figsize=(12,7))
     for label,p_short in POLICIES.items():
         try:
-            hp_delays=np.loadtxt(os.path.join(DATA_DIR,f'{p_short}_hp_delays.txt'));sns.ecdfplot(hp_delays,label=f'{label} (HP)',linewidth=3)
+            # SAFETY CHECK: If the delays file is completely empty because perfect routing led to 0 delay, populate with a zero so plot doesn't crash.
+            path_hp = os.path.join(DATA_DIR, f'{p_short}_hp_delays.txt')
+            if os.path.exists(path_hp) and os.path.getsize(path_hp) == 0:
+                with open(path_hp, 'w') as f: f.write("0.0\n")
+            
+            hp_delays=np.loadtxt(path_hp);sns.ecdfplot(hp_delays,label=f'{label} (HP)',linewidth=3)
             normal_delays=np.loadtxt(os.path.join(DATA_DIR,f'{p_short}_normal_delays.txt'));sns.ecdfplot(normal_delays,label=f'{label} (Normal)',linestyle='--',linewidth=3)
         except FileNotFoundError:print(f"⚠️ No delay logs for {label}, skipping in CDF plot.")
     plt.title('CDF of Packet End-to-End Delays',fontsize=18,fontweight='bold');plt.xlabel('Delay (s)');plt.ylabel('Probability (CDF)');plt.legend();plt.grid(True,linestyle=':');plt.xlim(left=0,right=2.5);plt.savefig(os.path.join(FIG_DIR,'fig_5_delay_cdf.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 5: Delay CDF")
