@@ -1,49 +1,61 @@
---- FINAL RESULTS (V74, MEAN ± 95% CI) ---
-                  throughput_kbps         pdr_pct         plr_pct avg_normal_delay_s avg_hp_delay_s     energy_nj_bit
-Policy                                                                                                               
-Proposed DQN-Edge   7.6542±0.0195  54.9055±0.2503  36.2767±0.4791      0.3238±0.0252  0.0000±0.0000  423.4730±17.4526
-Random              2.8000±0.0350  20.0709±0.3314  71.4943±0.5450      0.8545±0.0597  0.3521±0.0129  806.7023±22.7489
-Strict Priority     7.9104±0.0054  56.6625±0.3137  34.7224±0.5326      0.6171±0.0384  0.0274±0.0015  417.0370±17.2341
-
-✅ Raw and summary results exported.
-
-
---- 📈 Generating Publication Plots ---
-✅ Fig 1: Learning Curve
-✅ Fig 2: Reward Curve
-✅ Fig 3: Boxplots
-✅ Fig 4: Bar Charts
-✅ Fig 5: Delay CDF
-✅ Fig 6: Queue Violin Plot
-/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py:212: FutureWarning: 
-
-Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
-
-  plt.figure(figsize=(10,6));ax=sns.barplot(x=ACTION_LABELS,y=percentages,palette='viridis');ax.bar_label(ax.containers[0],fmt='%.1f%%');plt.title('DQN Agent Learned Policy',fontsize=18,fontweight='bold');plt.xlabel('Action');plt.ylabel('Policy Usage (%)');plt.ylim(0,1.1*percentages.max());plt.savefig(os.path.join(FIG_DIR,'fig_7_action_dist.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 7: Action Distribution")
-✅ Fig 7: Action Distribution
-✅ Fig 8: Radar Chart
-
-
---- 📋 Statistical Significance Table ---
-/home/heisenberg/ns3-workspace/rl-venv/lib/python3.10/site-packages/scipy/stats/_axis_nan_policy.py:586: UserWarning: scipy.stats.shapiro: Input data has range zero. The results may not be accurate.
-  res = hypotest_fun_out(*samples, **kwds)
-| Metric            |   p-value (vs. SP) |   Cohen's d | Test Used      |
-|:------------------|-------------------:|------------:|:---------------|
-| Throughput (kbps) |          6.431e-08 |     -8.3614 | Mann-Whitney U |
-| PDR (%)           |          5.743e-11 |     -2.8979 | Welch's t-test |
-| Avg. HP Delay (s) |          1.137e-19 |    -12.4396 | Welch's t-test |
-| Energy (nJ/bit)   |          0.5861    |      0.1737 | Welch's t-test |
-
-\begin{tabular}{llll}
-\toprule
- & p-value (vs. SP) & Cohen's d & Test Used \\
-Metric &  &  &  \\
-\midrule
-Throughput (kbps) & 6.431e-08 & -8.3614 & Mann-Whitney U \\
-PDR (%) & 5.743e-11 & -2.8979 & Welch's t-test \\
-Avg. HP Delay (s) & 1.137e-19 & -12.4396 & Welch's t-test \\
-Energy (nJ/bit) & 5.861e-01 & 0.1737 & Welch's t-test \\
-\bottomrule
-\end{tabular}
-
-(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
+throughput_kbps,pdr_pct,plr_pct,avg_normal_delay_s,avg_hp_delay_s,energy_nj_bit,action,Policy,run
+7.7248,54.0166,36.6972,0.331649,0.0,444.48,1,Proposed DQN-Edge,1
+7.92,55.5182,34.7465,0.579115,0.0229015,437.948,1,Strict Priority,1
+2.7328,19.0923,71.6521,0.80216,0.350639,849.459,1,Random,1
+7.6384,54.7226,36.1761,0.326979,0.0,430.532,1,Proposed DQN-Edge,2
+7.9136,56.3968,34.5724,0.62637,0.0293478,424.038,0,Strict Priority,2
+2.9056,21.0624,68.9167,0.876836,0.346684,780.214,3,Random,2
+7.5744,54.6399,35.6187,0.351711,0.0,476.899,1,Proposed DQN-Edge,3
+7.92,57.4779,33.2791,0.732241,0.0288869,463.805,1,Strict Priority,3
+2.7936,20.3307,70.7266,1.00826,0.389717,833.057,0,Random,3
+7.6768,54.6096,36.3533,0.456357,0.0,413.452,1,Proposed DQN-Edge,4
+7.9232,56.763,34.3879,0.723189,0.0302074,401.998,1,Strict Priority,4
+2.8384,20.265,72.584,1.01382,0.415443,784.954,0,Random,4
+7.68,55.918,35.9506,0.327958,0.0,414.871,1,Proposed DQN-Edge,5
+7.8944,57.1992,34.5467,0.618785,0.0251189,410.206,1,Strict Priority,5
+2.8256,20.3082,71.3661,0.941498,0.360154,800.262,2,Random,5
+7.6832,54.9177,35.6816,0.287255,0.0,450.746,1,Proposed DQN-Edge,6
+7.9008,56.5636,34.2497,0.56331,0.028408,442.65,1,Strict Priority,6
+2.7936,19.769,73.0752,0.797347,0.358486,845.376,4,Random,6
+7.6608,54.2365,36.5655,0.271763,0.0,423.987,1,Proposed DQN-Edge,7
+7.8944,55.9664,35.2768,0.524491,0.0284143,416.794,1,Strict Priority,7
+2.8352,20.2006,69.9498,0.767681,0.325278,799.161,3,Random,7
+7.6352,55.0912,36.5274,0.259681,0.0,428.166,1,Proposed DQN-Edge,8
+7.8912,56.9778,34.9584,0.525386,0.0255769,421.443,1,Strict Priority,8
+2.8576,20.7241,71.5479,0.756695,0.293253,799.008,3,Random,8
+7.632,55.3236,35.7226,0.430021,0.0,352.076,1,Proposed DQN-Edge,9
+7.9168,57.2818,33.5726,0.842191,0.0273843,345.344,1,Strict Priority,9
+2.8896,21.1972,71.5258,1.10546,0.351075,698.249,0,Random,9
+7.6416,54.8335,36.992,0.319263,0.0,481.174,1,Proposed DQN-Edge,10
+7.8944,56.5178,35.0745,0.647929,0.0282099,474.609,1,Strict Priority,10
+2.7744,19.8534,71.88,0.88,0.331695,895.735,0,Random,10
+7.5808,54.7366,35.9519,0.277417,0.0,438.12,1,Proposed DQN-Edge,11
+7.9168,56.8474,34.375,0.58836,0.0309567,429.978,0,Strict Priority,11
+2.6336,19.1262,73.5301,0.840421,0.350862,848.049,0,Random,11
+7.5872,55.0244,38.3848,0.340067,0.0,372.589,1,Proposed DQN-Edge,12
+7.9136,57.325,36.2772,0.657457,0.0235681,364.753,1,Strict Priority,12
+2.8128,20.2721,72.5323,0.827103,0.360174,753.319,0,Random,12
+7.7152,54.6712,35.1474,0.2837,0.0,415.567,1,Proposed DQN-Edge,13
+7.9008,55.7462,34.4322,0.541679,0.0270927,412.05,1,Strict Priority,13
+2.7744,19.5579,71.0129,0.679796,0.352785,802.007,3,Random,13
+7.68,55.1597,35.7159,0.379375,0.0,401.632,1,Proposed DQN-Edge,14
+7.92,56.9096,34.2837,0.680725,0.029841,395.321,1,Strict Priority,14
+2.832,20.2193,69.7738,0.917578,0.340483,782.075,2,Random,14
+7.6416,55.1629,34.1418,0.273618,0.0,469.951,1,Proposed DQN-Edge,15
+7.8944,56.9614,32.8331,0.551481,0.022021,469.514,0,Strict Priority,15
+2.6528,19.075,72.2273,0.76327,0.359497,891.287,0,Random,15
+7.6704,54.1328,37.8952,0.368627,0.0,404.297,1,Proposed DQN-Edge,16
+7.9168,55.633,36.2941,0.637599,0.0305633,400.603,0,Strict Priority,16
+2.7584,19.1088,72.0239,1.10438,0.302094,818.28,4,Random,16
+7.6608,55.8042,35.5711,0.343776,0.0,457.948,1,Proposed DQN-Edge,17
+7.9168,57.7767,33.6759,0.639542,0.0226345,449.877,0,Strict Priority,17
+2.9152,21.2058,70.7635,0.842157,0.341397,814.423,4,Random,17
+7.712,55.3133,37.3881,0.277593,0.0,377.443,1,Proposed DQN-Edge,18
+7.9264,55.8638,37.3929,0.57535,0.0331843,377.138,1,Strict Priority,18
+2.7168,19.2168,72.6347,0.771368,0.356693,785.877,3,Random,18
+7.6544,54.2035,37.6841,0.276296,0.0,452.689,1,Proposed DQN-Edge,19
+7.9136,56.1407,36.3224,0.536111,0.0248831,446.627,0,Strict Priority,19
+2.8192,20.1142,71.7352,0.662235,0.372652,826.986,0,Random,19
+7.6352,55.5918,35.3681,0.293881,0.0,362.84,1,Proposed DQN-Edge,20
+7.92,57.3847,33.8975,0.550383,0.0295761,356.044,0,Strict Priority,20
+2.8384,20.7195,70.4275,0.730943,0.383473,726.267,4,Random,20
