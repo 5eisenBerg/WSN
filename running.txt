@@ -13,20 +13,37 @@ Strict Priority     7.9104±0.0054  56.6625±0.3137  34.7224±0.5326      0.6171
 ✅ Fig 2: Reward Curve
 ✅ Fig 3: Boxplots
 ✅ Fig 4: Bar Charts
-Traceback (most recent call last):
-  File "/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py", line 242, in <module>
-    plot_all_figures()
-  File "/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py", line 194, in plot_all_figures
-    hp_delays=np.loadtxt(path_hp);sns.ecdfplot(hp_delays,label=f'{label} (HP)',linewidth=3)
-  File "/home/heisenberg/ns3-workspace/rl-venv/lib/python3.10/site-packages/seaborn/distributions.py", line 1875, in ecdfplot
-    p = _DistributionPlotter(
-  File "/home/heisenberg/ns3-workspace/rl-venv/lib/python3.10/site-packages/seaborn/distributions.py", line 110, in __init__
-    super().__init__(data=data, variables=variables)
-  File "/home/heisenberg/ns3-workspace/rl-venv/lib/python3.10/site-packages/seaborn/_base.py", line 634, in __init__
-    self.assign_variables(data, variables)
-  File "/home/heisenberg/ns3-workspace/rl-venv/lib/python3.10/site-packages/seaborn/_base.py", line 673, in assign_variables
-    frame, names = self._assign_variables_wideform(data, **variables)
-  File "/home/heisenberg/ns3-workspace/rl-venv/lib/python3.10/site-packages/seaborn/_base.py", line 726, in _assign_variables_wideform
-    empty = data is None or not len(data)
-TypeError: len() of unsized object
+✅ Fig 5: Delay CDF
+✅ Fig 6: Queue Violin Plot
+/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py:212: FutureWarning: 
+
+Passing `palette` without assigning `hue` is deprecated and will be removed in v0.14.0. Assign the `x` variable to `hue` and set `legend=False` for the same effect.
+
+  plt.figure(figsize=(10,6));ax=sns.barplot(x=ACTION_LABELS,y=percentages,palette='viridis');ax.bar_label(ax.containers[0],fmt='%.1f%%');plt.title('DQN Agent Learned Policy',fontsize=18,fontweight='bold');plt.xlabel('Action');plt.ylabel('Policy Usage (%)');plt.ylim(0,1.1*percentages.max());plt.savefig(os.path.join(FIG_DIR,'fig_7_action_dist.png'),dpi=300,bbox_inches="tight");plt.close();print("✅ Fig 7: Action Distribution")
+✅ Fig 7: Action Distribution
+✅ Fig 8: Radar Chart
+
+
+--- 📋 Statistical Significance Table ---
+/home/heisenberg/ns3-workspace/rl-venv/lib/python3.10/site-packages/scipy/stats/_axis_nan_policy.py:586: UserWarning: scipy.stats.shapiro: Input data has range zero. The results may not be accurate.
+  res = hypotest_fun_out(*samples, **kwds)
+| Metric            |   p-value (vs. SP) |   Cohen's d | Test Used      |
+|:------------------|-------------------:|------------:|:---------------|
+| Throughput (kbps) |          6.431e-08 |     -8.3614 | Mann-Whitney U |
+| PDR (%)           |          5.743e-11 |     -2.8979 | Welch's t-test |
+| Avg. HP Delay (s) |          1.137e-19 |    -12.4396 | Welch's t-test |
+| Energy (nJ/bit)   |          0.5861    |      0.1737 | Welch's t-test |
+
+\begin{tabular}{llll}
+\toprule
+ & p-value (vs. SP) & Cohen's d & Test Used \\
+Metric &  &  &  \\
+\midrule
+Throughput (kbps) & 6.431e-08 & -8.3614 & Mann-Whitney U \\
+PDR (%) & 5.743e-11 & -2.8979 & Welch's t-test \\
+Avg. HP Delay (s) & 1.137e-19 & -12.4396 & Welch's t-test \\
+Energy (nJ/bit) & 5.861e-01 & 0.1737 & Welch's t-test \\
+\bottomrule
+\end{tabular}
+
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent/training$ 
