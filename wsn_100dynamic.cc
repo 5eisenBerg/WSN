@@ -6,22 +6,22 @@
 #include <sstream>
 #include <deque>
 #include <numeric>
+#include <fstream>
 
 using namespace ns3;
-NS_LOG_COMPONENT_DEFINE("WSN_Final_V55_Module1");
+NS_LOG_COMPONENT_DEFINE("WSN_Final_V57_FullData");
 
+// V55 Constants are perfect for Module 1
 #define NUM_SENSORS 100
 #define NUM_SINKS 1
 #define NUM_NODES (NUM_SENSORS + NUM_SINKS)
 #define SINK_NODE_ID NUM_SENSORS
-
 #define STATE_SIZE 6
 #define ACTION_SIZE 5
 #define INITIAL_ENERGY 0.5
 #define MAX_QUEUE_CAPACITY 30
 #define PACKET_BITS 800
 #define MAX_SIM_STEPS 5000
-
 const double SENSING_ENERGY_NJ=20.0,IDLE_ENERGY_NJ=10.0,SLEEP_ENERGY_NJ=1.0;
 const double HP_TIMEOUT=2.0, NORMAL_TIMEOUT=5.0;
 const double ALPHA=0.7,BETA=0.3,E_ELEC=50e-9,E_FS=10e-12,E_MP=0.0013e-12,D0=sqrt(E_FS/E_MP);
@@ -36,6 +36,7 @@ static Ptr<UniformRandomVariable> g_rand;
 static uint64_t g_packetsGenerated=0, g_packetsDelivered=0, g_packetsDropped=0, g_normalPacketsDelivered=0, g_hpPacketsDelivered=0;
 static double g_totalNormalDelay=0.0, g_totalHpDelay=0.0;
 static std::string g_per_step_info = "";
+static std::ofstream g_hp_delay_file, g_normal_delay_file, g_queue_file, g_energy_file;
 
 void ConsumeJouleEnergy(uint32_t n,double nj){if(g_nodesState[n].residualEnergy>0){g_nodesState[n].residualEnergy=std::max(0.0,g_nodesState[n].residualEnergy-(nj*1e-9));}}
 void ConsumeBitEnergy(uint32_t n,double b,double d){if(g_nodesState[n].residualEnergy>0){double c=E_ELEC*b;if(d>0)c+=(d<D0)?(E_FS*b*pow(d,2)):(E_MP*b*pow(d,4));ConsumeJouleEnergy(n,c*1e9);}}
@@ -47,10 +48,10 @@ std::string GetExtraInfo(){return g_per_step_info;}
 
 bool GetGameOver(){
     g_sim_step_count++;
-    if (g_sim_step_count >= MAX_SIM_STEPS) {
+    if (g_sim_step_count >= MAX_SIM_STEPS){
         double s=Simulator::Now().GetSeconds();double t=(s>0)?(g_packetsDelivered*PACKET_BITS/s)/1000.0:0.0;double pdr=(g_packetsGenerated>0)?((double)g_packetsDelivered/g_packetsGenerated)*100.0:0.0;double plr=(g_packetsGenerated>0)?((double)g_packetsDropped/g_packetsGenerated)*100.0:0.0;double nd=(g_normalPacketsDelivered>0)?(g_totalNormalDelay/g_normalPacketsDelivered):0.0;double hd=(g_hpPacketsDelivered>0)?(g_totalHpDelay/g_hpPacketsDelivered):0.0;double te=0;for(uint32_t j=0;j<NUM_SENSORS;++j)te+=g_nodesState[j].residualEnergy;double ec=(NUM_SENSORS*INITIAL_ENERGY)-te;double eff=(g_packetsDelivered>0)?(ec*1e9)/(g_packetsDelivered*PACKET_BITS):0.0;
         std::stringstream ss;ss<<"{\"throughput_kbps\":"<<t<<",\"pdr_pct\":"<<pdr<<",\"plr_pct\":"<<plr<<",\"avg_normal_delay_s\":"<<nd<<",\"avg_hp_delay_s\":"<<hd<<",\"energy_nj_bit\":"<<eff<<"}";
-        g_per_step_info = ss.str();
+        g_per_step_info=ss.str();
         return true;
     }
     return false;
@@ -67,7 +68,10 @@ Ptr<OpenGymDataContainer> GetObservation(){
             if(attempts<100){g_packetsGenerated++;ConsumeJouleEnergy(taskNode,SENSING_ENERGY_NJ);double dist=g_allNodes.Get(taskNode)->GetObject<MobilityModel>()->GetDistanceFrom(g_allNodes.Get(g_currentCH)->GetObject<MobilityModel>());ConsumeBitEnergy(taskNode,PACKET_BITS,dist);ConsumeBitEnergy(g_currentCH,PACKET_BITS,0);
             if(g_rand->GetValue()<0.25){if(g_nodesState[g_currentCH].hp_q.size()<MAX_QUEUE_CAPACITY)g_nodesState[g_currentCH].hp_q.push_back({Simulator::Now()});else g_packetsDropped++;}
             else{if(g_nodesState[g_currentCH].normal_q.size()<MAX_QUEUE_CAPACITY)g_nodesState[g_currentCH].normal_q.push_back({Simulator::Now()});else g_packetsDropped++;}}}}
-    std::stringstream ss;ss<<"{\"hp_timeout\":"<<hp_timeout_drops<<",\"normal_timeout\":"<<n_timeout_drops<<"}"; g_per_step_info = ss.str();
+    std::stringstream ss;ss<<"{\"hp_timeout\":"<<hp_timeout_drops<<",\"normal_timeout\":"<<n_timeout_drops<<"}"; g_per_step_info=ss.str();
+    g_queue_file<<Simulator::Now().GetSeconds()<<","<<g_nodesState[g_currentCH].hp_q.size()<<","<<g_nodesState[g_currentCH].normal_q.size()<<std::endl;
+    double total_energy=0; for(uint32_t i=0;i<NUM_SENSORS;++i)total_energy+=g_nodesState[i].residualEnergy;
+    g_energy_file<<Simulator::Now().GetSeconds()<<","<<total_energy/(NUM_SENSORS*INITIAL_ENERGY)<<std::endl;
     auto box=CreateObject<OpenGymBoxContainer<double>>(std::vector<uint32_t>{STATE_SIZE});
     double n_age=g_nodesState[g_currentCH].normal_q.empty()?0.0:(Simulator::Now()-g_nodesState[g_currentCH].normal_q.front().enqueueTime).GetSeconds();
     double hp_age=g_nodesState[g_currentCH].hp_q.empty()?0.0:(Simulator::Now()-g_nodesState[g_currentCH].hp_q.front().enqueueTime).GetSeconds();
@@ -77,12 +81,12 @@ Ptr<OpenGymDataContainer> GetObservation(){
 bool ExecuteActions(Ptr<OpenGymDataContainer> a){
     uint32_t act=DynamicCast<OpenGymDiscreteContainer>(a)->GetValue();double dist_to_sink=g_allNodes.Get(g_currentCH)->GetObject<MobilityModel>()->GetDistanceFrom(g_allNodes.Get(SINK_NODE_ID)->GetObject<MobilityModel>());
     uint32_t hp_s=0,n_s=0,hp_d=0,n_d=0;
-    if(act==0&&!g_nodesState[g_currentCH].hp_q.empty()){PacketInfo p=g_nodesState[g_currentCH].hp_q.front();g_nodesState[g_currentCH].hp_q.pop_front();g_totalHpDelay+=(Simulator::Now()-p.enqueueTime).GetSeconds();g_hpPacketsDelivered++;g_packetsDelivered++;ConsumeBitEnergy(g_currentCH,PACKET_BITS,dist_to_sink);hp_s=1;}
-    else if(act==1&&!g_nodesState[g_currentCH].normal_q.empty()){PacketInfo p=g_nodesState[g_currentCH].normal_q.front();g_nodesState[g_currentCH].normal_q.pop_front();g_totalNormalDelay+=(Simulator::Now()-p.enqueueTime).GetSeconds();g_normalPacketsDelivered++;g_packetsDelivered++;ConsumeBitEnergy(g_currentCH,PACKET_BITS,dist_to_sink);n_s=1;}
+    if(act==0&&!g_nodesState[g_currentCH].hp_q.empty()){PacketInfo p=g_nodesState[g_currentCH].hp_q.front();g_nodesState[g_currentCH].hp_q.pop_front();double delay=(Simulator::Now()-p.enqueueTime).GetSeconds();g_hp_delay_file<<delay<<std::endl;g_totalHpDelay+=delay;g_hpPacketsDelivered++;g_packetsDelivered++;ConsumeBitEnergy(g_currentCH,PACKET_BITS,dist_to_sink);hp_s=1;}
+    else if(act==1&&!g_nodesState[g_currentCH].normal_q.empty()){PacketInfo p=g_nodesState[g_currentCH].normal_q.front();g_nodesState[g_currentCH].normal_q.pop_front();double delay=(Simulator::Now()-p.enqueueTime).GetSeconds();g_normal_delay_file<<delay<<std::endl;g_totalNormalDelay+=delay;g_normalPacketsDelivered++;g_packetsDelivered++;ConsumeBitEnergy(g_currentCH,PACKET_BITS,dist_to_sink);n_s=1;}
     else if(act==2&&!g_nodesState[g_currentCH].normal_q.empty()){g_nodesState[g_currentCH].normal_q.pop_front();g_packetsDropped++;n_d=1;}
     else if(act==3){ConsumeJouleEnergy(g_currentCH,SLEEP_ENERGY_NJ);}
     else if(act==4&&!g_nodesState[g_currentCH].hp_q.empty()){g_nodesState[g_currentCH].hp_q.pop_front();g_packetsDropped++;hp_d=1;}
-    else {ConsumeJouleEnergy(g_currentCH,IDLE_ENERGY_NJ);}
+    else{ConsumeJouleEnergy(g_currentCH,IDLE_ENERGY_NJ);}
     std::string current_info=g_per_step_info;current_info.pop_back();
     std::stringstream ss;ss<<",\"hp_sent\":"<<hp_s<<",\"normal_sent\":"<<n_s<<",\"hp_dropped\":"<<hp_d<<",\"normal_dropped\":"<<n_d<<"}";
     current_info+=ss.str();g_per_step_info=current_info;
@@ -94,6 +98,8 @@ void ScheduleNextStep(uint32_t i,uint32_t&c){
     c++;g_gym->NotifyCurrentState();Simulator::Schedule(MilliSeconds(100),&ScheduleNextStep,i,c);
 }
 int main(int argc,char*argv[]){
+    g_hp_delay_file.open("hp_delays.txt",std::ofstream::out|std::ofstream::trunc);g_normal_delay_file.open("normal_delays.txt",std::ofstream::out|std::ofstream::trunc);
+    g_queue_file.open("queue_log.txt",std::ofstream::out|std::ofstream::trunc);g_energy_file.open("energy_log.txt",std::ofstream::out|std::ofstream::trunc);
     g_sim_step_count=0;uint32_t p=5555,r=1;CommandLine cmd;cmd.AddValue("openGymPort","Port",p);cmd.AddValue("run","Run",r);cmd.Parse(argc,argv);
     SeedManager::SetSeed(12345);SeedManager::SetRun(r);g_rand=CreateObject<UniformRandomVariable>();g_allNodes.Create(NUM_NODES);
     Ptr<ListPositionAllocator> spa=CreateObject<ListPositionAllocator>();spa->Add(Vector(50.0,150.0,0.0));
@@ -104,5 +110,7 @@ int main(int argc,char*argv[]){
     ElectClusterHead();g_gym=CreateObject<OpenGymInterface>(p);
     g_gym->SetGetObservationSpaceCb(MakeCallback(&GetObservationSpace));g_gym->SetGetActionSpaceCb(MakeCallback(&GetActionSpace));g_gym->SetGetObservationCb(MakeCallback(&GetObservation));g_gym->SetExecuteActionsCb(MakeCallback(&ExecuteActions));g_gym->SetGetGameOverCb(MakeCallback(&GetGameOver));g_gym->SetGetExtraInfoCb(MakeCallback(&GetExtraInfo));
     uint32_t rc=0;Simulator::Schedule(MilliSeconds(100),&ScheduleNextStep,100,rc);
-    Simulator::Run();Simulator::Destroy();return 0;
+    Simulator::Run();Simulator::Destroy();
+    g_hp_delay_file.close();g_normal_delay_file.close();g_queue_file.close();g_energy_file.close();
+    return 0;
 }
