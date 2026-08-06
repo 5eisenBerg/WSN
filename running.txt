@@ -1,17 +1,8 @@
-(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent$ pip install pandas numpy torch tqdm seaborn matplotlib ns3gym openpyxl
-Collecting pandas
-  Using cached pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
-Collecting numpy
-  Using cached numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
-Collecting torch
-  Using cached torch-2.13.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (38 kB)
-Collecting tqdm
-  Using cached tqdm-4.70.0-py3-none-any.whl.metadata (57 kB)
-Collecting seaborn
-  Using cached seaborn-0.13.2-py3-none-any.whl.metadata (5.4 kB)
-Collecting matplotlib
-  Using cached matplotlib-3.11.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (80 kB)
-ERROR: Ignored the following versions that require a different python version: 1.21.2 Requires-Python >=3.7,<3.11; 1.21.3 Requires-Python >=3.7,<3.11; 1.21.4 Requires-Python >=3.7,<3.11; 1.21.5 Requires-Python >=3.7,<3.11; 1.21.6 Requires-Python >=3.7,<3.11
-ERROR: Could not find a version that satisfies the requirement ns3gym (from versions: none)
-ERROR: No matching distribution found for ns3gym
-(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent$ 
+heisenberg@heisenberg:~/ns3-workspace/rl-agent$ sudo apt install python3.10 python3.10-venv -y
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+python3.10 is already the newest version (3.10.20-1+noble1).
+python3.10-venv is already the newest version (3.10.20-1+noble1).
+0 upgraded, 0 newly installed, 0 to remove and 116 not upgraded.
+heisenberg@heisenberg:~/ns3-workspace/rl-agent$ 
