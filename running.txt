@@ -1,19 +1,17 @@
-(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent$ pip install pandas numpy torch tqdm seaborn matplotlib ns3gymopenpyxl
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent$ pip install pandas numpy torch tqdm seaborn matplotlib ns3gym openpyxl
 Collecting pandas
-  Downloading pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 79.5/79.5 kB 619.1 kB/s eta 0:00:00
+  Using cached pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
 Collecting numpy
-  Downloading numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+  Using cached numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
 Collecting torch
-  Downloading torch-2.13.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (38 kB)
+  Using cached torch-2.13.0-cp312-cp312-manylinux_2_28_x86_64.whl.metadata (38 kB)
 Collecting tqdm
   Using cached tqdm-4.70.0-py3-none-any.whl.metadata (57 kB)
 Collecting seaborn
   Using cached seaborn-0.13.2-py3-none-any.whl.metadata (5.4 kB)
 Collecting matplotlib
-  Downloading matplotlib-3.11.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (80 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.3/80.3 kB 664.8 kB/s eta 0:00:00
+  Using cached matplotlib-3.11.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (80 kB)
 ERROR: Ignored the following versions that require a different python version: 1.21.2 Requires-Python >=3.7,<3.11; 1.21.3 Requires-Python >=3.7,<3.11; 1.21.4 Requires-Python >=3.7,<3.11; 1.21.5 Requires-Python >=3.7,<3.11; 1.21.6 Requires-Python >=3.7,<3.11
-ERROR: Could not find a version that satisfies the requirement ns3gymopenpyxl (from versions: none)
-ERROR: No matching distribution found for ns3gymopenpyxl
+ERROR: Could not find a version that satisfies the requirement ns3gym (from versions: none)
+ERROR: No matching distribution found for ns3gym
 (rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent$ 
