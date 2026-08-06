@@ -1,5 +1,82 @@
-Why DQN HP Delay is 0
+Replace the V75 shaping constants with this softer version
 
-In simulator logic, HP delay is forced to 0.0 when no HP packets are delivered: wsn_100dynamic.cc:146-164.
-Your DQN policy collapsed to always action 1 (send normal): DQN_actions.txt has {1: 2499} (100%), while action 0 is the only HP-send path in wsn_100dynamic.cc:266-277.
-Plotting code also masks empties by writing 0.0 into empty HP delay files before CDF plotting: run_final_pipeline.py:372-379. That is why DQN_hp_delays.txt ended up containing only 0.0.
+--- V75 REWARD SHAPING (SOFT GUIDANCE, NOT HARD CODING) ---
+HP_IGNORE_PENALTY = -8.0
+HP_SERVICE_REWARD = 6.0
+HP_URGENT_AGE_THRESHOLD = 0.55
+
+Replace calculate_reward_v75 with this
+
+def calculate_reward_v75(s, ps, info):
+reward = info.get('hp_sent', 0) * HP_DELIVERY_REWARD + info.get('normal_sent', 0) * NORMAL_DELIVERY_REWARD
+reward += info.get('hp_dropped', 0) * HP_DROP_PENALTY + info.get('normal_dropped', 0) * NORMAL_DROP_PENALTY
+reward += info.get('hp_timeout', 0) * HP_TIMEOUT_PENALTY + info.get('normal_timeout', 0) * NORMAL_TIMEOUT_PENALTY
+reward += (s[4] ** 2) * HP_LATENCY_PENALTY + (s[3] ** 2) * NORMAL_LATENCY_PENALTY
+
+hp_queue_has_packets = ps[1] > 0
+hp_age_prev = ps[4]
+action_taken = info.get('action')
+
+if hp_queue_has_packets:
+if action_taken == 0:
+reward += HP_SERVICE_REWARD
+elif hp_age_prev >= HP_URGENT_AGE_THRESHOLD:
+reward += HP_IGNORE_PENALTY
+
+energy_decay = ps[2] - s[2]
+if energy_decay > 0:
+reward -= energy_decay * ENERGY_PENALTY_WEIGHT
+if action_taken == 3:
+reward += SLEEP_REWARD
+
+return np.tanh(reward / 100.0)
+
+Replace get_eval_score with this HP-aware version
+
+def get_eval_score(res):
+pdr = res.get('pdr_pct', 0.0)
+plr = res.get('plr_pct', 100.0)
+hd = res.get('avg_hp_delay_s', 2.0)
+
+hp_generated = res.get('hp_generated', 0.0)
+hp_delivered = res.get('hp_delivered', 0.0)
+hp_delivery_ratio = res.get('hp_delivery_ratio_pct', 0.0)
+
+hp_delay_component = 0.0 if hp_delivered <= 0 else (1.0 - min(hd / 1.0, 1.0))
+
+score = (
+0.40 * (pdr / 100.0) +
+0.10 * (1.0 - plr / 100.0) +
+0.35 * (hp_delivery_ratio / 100.0) +
+0.15 * hp_delay_component
+)
+
+if hp_generated > 0 and hp_delivered == 0:
+score -= 0.25
+
+return np.clip(score, 0.0, 1.0)
+
+In plot_all_figures, replace the delay-CDF loading block so empty files are skipped (no fake 0.0)
+
+Find the section under Fig 5 and replace only the inside of the for-loop with:
+
+for label, p_short in POLICIES.items():
+    try:
+        path_hp = os.path.join(DATA_DIR, f'{p_short}_hp_delays.txt')
+        if os.path.exists(path_hp) and os.path.getsize(path_hp) > 0:
+            hp_delays = np.loadtxt(path_hp, ndmin=1)
+            sns.ecdfplot(hp_delays, label=f'{label} (HP)', linewidth=3)
+        else:
+            print(f"⚠️ Empty or missing HP delay log for {label}, skipping HP CDF.")
+
+        path_normal = os.path.join(DATA_DIR, f'{p_short}_normal_delays.txt')
+        if os.path.exists(path_normal) and os.path.getsize(path_normal) > 0:
+            normal_delays = np.loadtxt(path_normal, ndmin=1)
+            sns.ecdfplot(normal_delays, label=f'{label} (Normal)', linestyle='--', linewidth=3)
+        else:
+            print(f"⚠️ Empty or missing normal delay log for {label}, skipping normal CDF.")
+
+    except FileNotFoundError:
+        print(f"⚠️ No delay logs for {label}, skipping in CDF plot.")
+
+After pasting these changes, run again and compare DQN vs Strict Priority in raw_results_v75.csv. If you want, I can also give you a minimal action-safety function that protects urgent HP only (instead of forcing strict-priority behavior).
