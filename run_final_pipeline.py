@@ -7,37 +7,38 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from math import pi
 
-# --- V75 Config: The Definitive, Policy-Guided Script ---
+# --- V76 Config: Softer Guidance & HP-Aware Evaluation ---
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(CURRENT_DIR, 'data_v75')
-FIG_DIR = os.path.join(CURRENT_DIR, 'figures_v75')
+DATA_DIR = os.path.join(CURRENT_DIR, 'data_v76')
+FIG_DIR = os.path.join(CURRENT_DIR, 'figures_v76')
 sys.path.append(os.path.join(os.path.dirname(CURRENT_DIR), 'networks'))
 from network import DQN
 
 NS3_PATH = '/home/heisenberg/ns3-workspace/bake/source/ns-3.40'
 SIM_SCRIPT = 'wsn_100dynamic'
 PORT = 5555
-MODEL_PATH = os.path.join(CURRENT_DIR, "v75_best.pth")
+MODEL_PATH = os.path.join(CURRENT_DIR, "v76_best.pth")
 
 STATE_SIZE, ACTION_SIZE = 6, 5
 TRAINING_EPOCHS, TRAIN_STEPS_PER_EPOCH, EVAL_STEPS = 50, 5000, 5000
 BASE_SEED = 12345
 VALIDATION_SEEDS = [99991, 99992, 99993, 99994, 99995]
 
-# V75: Final Reward Function with Active Policy Guidance
-HP_DELIVERY_REWARD = 30.0
+# V76: Final Reward Function with Softer, Urgent-Only Guidance
+HP_DELIVERY_REWARD = 25.0
 NORMAL_DELIVERY_REWARD = 5.0
-HP_DROP_PENALTY = -50.0
-NORMAL_DROP_PENALTY = -10.0
-HP_TIMEOUT_PENALTY = -100.0
-NORMAL_TIMEOUT_PENALTY = -20.0
-HP_LATENCY_PENALTY = -50.0
-NORMAL_LATENCY_PENALTY = -5.0
+HP_DROP_PENALTY = -40.0
+NORMAL_DROP_PENALTY = -8.0
+HP_TIMEOUT_PENALTY = -80.0
+NORMAL_TIMEOUT_PENALTY = -10.0
+HP_LATENCY_PENALTY = -40.0
+NORMAL_LATENCY_PENALTY = -2.0
 ENERGY_PENALTY_WEIGHT = 250.0
 SLEEP_REWARD = 0.5
-# --- V75 REWARD SHAPING ---
-HP_IGNORE_PENALTY = -25.0  # Large penalty for ignoring a waiting HP packet
-HP_SERVICE_REWARD = 15.0  # Explicit reward for choosing to service HP
+# --- V76 REWARD SHAPING (SOFT GUIDANCE) ---
+HP_IGNORE_PENALTY = -8.0
+HP_SERVICE_REWARD = 6.0
+HP_URGENT_AGE_THRESHOLD = 0.55
 
 EPSILON_DECAY = 0.99995
 WARMUP_STEPS = 4000
@@ -113,21 +114,19 @@ class PER_DoubleDQNAgent:
         self.model.load_state_dict(c["model"]); self.optimizer.load_state_dict(c["optimizer"]); self.scheduler.load_state_dict(c["scheduler"])
         self.epsilon = c["epsilon"]; self.train_steps = c["step"]; self.target.load_state_dict(self.model.state_dict())
 
-def calculate_reward_v75(s, ps, info):
+def calculate_reward_v76(s, ps, info):
     reward = info.get('hp_sent', 0) * HP_DELIVERY_REWARD + info.get('normal_sent', 0) * NORMAL_DELIVERY_REWARD
     reward += info.get('hp_dropped', 0) * HP_DROP_PENALTY + info.get('normal_dropped', 0) * NORMAL_DROP_PENALTY
     reward += info.get('hp_timeout', 0) * HP_TIMEOUT_PENALTY + info.get('normal_timeout', 0) * NORMAL_TIMEOUT_PENALTY
     reward += (s[4] ** 2) * HP_LATENCY_PENALTY + (s[3] ** 2) * NORMAL_LATENCY_PENALTY
-    
-    # --- ACTIVE POLICY GUIDANCE (V75 Correction) ---
-    hp_queue_has_packets = ps[1] > 0  # Check previous state's HP queue
+    hp_queue_has_packets = ps[1] > 0
+    hp_age_prev = ps[4]
     action_taken = info.get('action')
     if hp_queue_has_packets:
-        if action_taken == 0:  # Action 0 is 'Send HP'
+        if action_taken == 0:
             reward += HP_SERVICE_REWARD
-        else:
+        elif hp_age_prev >= HP_URGENT_AGE_THRESHOLD:
             reward += HP_IGNORE_PENALTY
-
     energy_decay = ps[2] - s[2]
     if energy_decay > 0:
         reward -= energy_decay * ENERGY_PENALTY_WEIGHT
@@ -140,7 +139,7 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
     from ns3gym import ns3env
     cmd = f"./ns3 run '{SIM_SCRIPT} --openGymPort={PORT} --run={run_id}'"
     p = subprocess.Popen(cmd, cwd=NS3_PATH, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(4) # Increased sleep to ensure simulator is ready
+    time.sleep(4)
     env = None; original_epsilon = None; actions_log = []; rewards_log = []
     try:
         env = ns3env.Ns3Env(port=PORT, startSim=False)
@@ -168,7 +167,7 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
             s_next, _, d, info_str = env.step(a)
             info = json.loads(info_str if info_str else '{}'); info['action'] = a; s_next = np.array(s_next, dtype=np.float32)
             if train_mode:
-                r = 0 if d else calculate_reward_v75(s_next, ps, info) # Use V75 reward
+                r = 0 if d else calculate_reward_v76(s_next, ps, info)
                 rewards_log.append(r); agent.remember(s, a, r, s_next, d); agent.train()
             s = s_next
             if d:
@@ -192,17 +191,26 @@ def run_simulation(policy, steps, train_mode=False, run_id=1, agent=None, seed=B
         subprocess.run(f"pkill -9 -f {SIM_SCRIPT}", shell=True, check=False); time.sleep(1)
 
 def get_eval_score(res):
-    pdr = res.get('pdr_pct', 0); plr = res.get('plr_pct', 100); hd = res.get('avg_hp_delay_s', 2.0)
-    return np.clip((0.6 * pdr / 100.0) + (0.1 * (1 - plr / 100.0)) + (0.3 * (1 - min(hd / 1.0, 1.0))), 0.0, 1.0)
+    pdr = res.get('pdr_pct', 0.0)
+    plr = res.get('plr_pct', 100.0)
+    hd = res.get('avg_hp_delay_s', 2.0)
+    hp_generated = res.get('hp_generated', 0.0)
+    hp_delivered = res.get('hp_delivered', 0.0)
+    hp_delivery_ratio = res.get('hp_delivery_ratio_pct', 0.0)
+    hp_delay_component = 0.0 if hp_delivered <= 0 else (1.0 - min(hd / 1.0, 1.0))
+    score = (0.40 * (pdr / 100.0) + 0.10 * (1.0 - plr / 100.0) + 0.35 * (hp_delivery_ratio / 100.0) + 0.15 * hp_delay_component)
+    if hp_generated > 0 and hp_delivered == 0:
+        score -= 0.25
+    return np.clip(score, 0.0, 1.0)
 
 def main_experiment():
-    print("🛠️ V75: Rebuilding NS-3..."); build = subprocess.run(f"./ns3 build", cwd=NS3_PATH, shell=True, capture_output=True, text=True)
+    print("🛠️ V76: Rebuilding NS-3..."); build = subprocess.run(f"./ns3 build", cwd=NS3_PATH, shell=True, capture_output=True, text=True)
     if build.returncode != 0: print(f"❌ Build Fail:\n{build.stderr}"); sys.exit(1)
     print("✅ Build OK.")
     if os.path.exists(DATA_DIR): shutil.rmtree(DATA_DIR)
     os.makedirs(DATA_DIR, exist_ok=True)
     training_agent = PER_DoubleDQNAgent(); best_eval_score = float("-inf"); best_epoch = 0; train_log = []
-    print("\n🧠 V75: Training Final DQN with Policy Guidance...")
+    print("\n🧠 V76: Training Final DQN with Soft Policy Guidance...")
     for epoch in range(TRAINING_EPOCHS):
         epoch_seed = BASE_SEED + epoch; print(f"\n--- Epoch {epoch + 1}/{TRAINING_EPOCHS} (Seed: {epoch_seed}) ---")
         _, training_agent = run_simulation("DQN", TRAIN_STEPS_PER_EPOCH, True, epoch + 1, agent=training_agent, seed=epoch_seed, collect_data=(epoch == 0))
@@ -218,15 +226,15 @@ def main_experiment():
             best_eval_score = mean_score; best_epoch = epoch; training_agent.save(MODEL_PATH)
             print(f"  🥇 New best model saved (Score: {best_eval_score:.4f})")
         if epoch - best_epoch >= 15: print("--- Early stopping triggered ---"); break
-    pd.DataFrame(train_log).to_csv("training_log_v75.csv", index=False)
-    print("\n📊 V75: Final Evaluation..."); raw_results = []
+    pd.DataFrame(train_log).to_csv("training_log_v76.csv", index=False)
+    print("\n📊 V76: Final Evaluation..."); raw_results = []
     for i in range(20):
         run_seed = BASE_SEED + 200 + i; print(f"\n--- Eval Run {i + 1}/20 (Seed: {run_seed}) ---")
         for label, policy in POLICIES.items():
             metrics, _ = run_simulation(policy, EVAL_STEPS, False, i + 1, seed=run_seed, collect_data=(i == 0))
             if metrics: metrics['Policy'] = label; metrics['run'] = i + 1; raw_results.append(metrics)
             else: print(f"Warning: Empty metrics for {label} on run {i + 1}")
-    raw_df = pd.DataFrame(raw_results); raw_df.to_csv('raw_results_v75.csv', index=False)
+    raw_df = pd.DataFrame(raw_results); raw_df.to_csv('raw_results_v76.csv', index=False)
     summary_data = []
     for policy, group in raw_df.groupby('Policy'):
         entry = {'Policy': policy}
@@ -235,13 +243,13 @@ def main_experiment():
             mean = group[col].mean(); ci = stats.t.ppf(0.975, len(group) - 1) * group[col].std(ddof=1) / np.sqrt(len(group))
             entry[col] = f"{mean:.4f}±{ci:.4f}"
         summary_data.append(entry)
-    summary_df = pd.DataFrame(summary_data).set_index('Policy'); print("\n\n--- FINAL RESULTS (V75, MEAN ± 95% CI) ---"); print(summary_df.to_string())
-    summary_df.to_excel("final_results_v75.xlsx"); print("\n✅ Raw and summary results exported.")
+    summary_df = pd.DataFrame(summary_data).set_index('Policy'); print("\n\n--- FINAL RESULTS (V76, MEAN ± 95% CI) ---"); print(summary_df.to_string())
+    summary_df.to_excel("final_results_v76.xlsx"); print("\n✅ Raw and summary results exported.")
 
 def plot_all_figures():
     print("\n\n--- 📈 Generating Publication Plots ---"); sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2); os.makedirs(FIG_DIR, exist_ok=True)
     try:
-        raw_df = pd.read_csv('raw_results_v75.csv'); log_df = pd.read_csv('training_log_v75.csv')
+        raw_df = pd.read_csv('raw_results_v76.csv'); log_df = pd.read_csv('training_log_v76.csv')
     except FileNotFoundError: print("❌ Data files not found. Cannot generate plots."); return
     try:
         fig, ax1 = plt.subplots(figsize=(12, 7)); ax2 = ax1.twinx(); ax1.plot(log_df['epoch'], log_df['score'].rolling(5, min_periods=1, center=True).mean(), 'b-', label='Validation Score (5-Epoch Avg)', linewidth=3); ax2.plot(log_df['epoch'], log_df['epsilon'], 'r--', label='Epsilon Decay', alpha=0.6); ax1.set_xlabel('Training Epoch'); ax1.set_ylabel('Validation Score', color='b'); ax2.set_ylabel('Epsilon', color='r'); best_idx = log_df['score'].idxmax(); best_score = log_df['score'].max(); best_epoch = log_df['epoch'][best_idx]; ax1.axvline(x=best_epoch, color='g', linestyle='--', label=f'Best Model @ Epoch {best_epoch}'); ax1.scatter(best_epoch, best_score, color='g', s=150, zorder=5); plt.title('Agent Training Progression', fontsize=18, fontweight='bold'); fig.legend(loc="upper right", bbox_to_anchor=(0.9, 0.9)); plt.tight_layout(); plt.savefig(os.path.join(FIG_DIR, 'fig_1_learning_curve.png'), dpi=300, bbox_inches="tight"); plt.close(); print("✅ Fig 1: Learning Curve")
@@ -258,14 +266,19 @@ def plot_all_figures():
     for label, p_short in POLICIES.items():
         try:
             path_hp = os.path.join(DATA_DIR, f'{p_short}_hp_delays.txt')
-            if os.path.exists(path_hp) and os.path.getsize(path_hp) == 0:
-                with open(path_hp, 'w') as f: f.write("0.0\n")
-            hp_delays = np.loadtxt(path_hp, ndmin=1); sns.ecdfplot(hp_delays, label=f'{label} (HP)', linewidth=3)
+            if os.path.exists(path_hp) and os.path.getsize(path_hp) > 0:
+                hp_delays = np.loadtxt(path_hp, ndmin=1)
+                sns.ecdfplot(hp_delays, label=f'{label} (HP)', linewidth=3)
+            else:
+                print(f"⚠️ Empty or missing HP delay log for {label}, skipping HP CDF.")
             path_normal = os.path.join(DATA_DIR, f'{p_short}_normal_delays.txt')
-            if os.path.exists(path_normal) and os.path.getsize(path_normal) == 0:
-                with open(path_normal, 'w') as f: f.write("0.0\n")
-            normal_delays = np.loadtxt(path_normal, ndmin=1); sns.ecdfplot(normal_delays, label=f'{label} (Normal)', linestyle='--', linewidth=3)
-        except FileNotFoundError: print(f"⚠️ No delay logs for {label}, skipping in CDF plot.")
+            if os.path.exists(path_normal) and os.path.getsize(path_normal) > 0:
+                normal_delays = np.loadtxt(path_normal, ndmin=1)
+                sns.ecdfplot(normal_delays, label=f'{label} (Normal)', linestyle='--', linewidth=3)
+            else:
+                print(f"⚠️ Empty or missing normal delay log for {label}, skipping normal CDF.")
+        except FileNotFoundError:
+            print(f"⚠️ No delay logs for {label}, skipping in CDF plot.")
     plt.title('CDF of Packet End-to-End Delays', fontsize=18, fontweight='bold'); plt.xlabel('Delay (s)'); plt.ylabel('Probability (CDF)'); plt.legend(); plt.grid(True, linestyle=':'); plt.xlim(left=0, right=2.5); plt.savefig(os.path.join(FIG_DIR, 'fig_5_delay_cdf.png'), dpi=300, bbox_inches="tight"); plt.close(); print("✅ Fig 5: Delay CDF")
     all_q_data = []
     for label, p_short in POLICIES.items():
@@ -294,7 +307,7 @@ def plot_all_figures():
 def generate_stats_table():
     print("\n\n--- 📋 Statistical Significance Table ---")
     try:
-        raw_df = pd.read_csv('raw_results_v75.csv')
+        raw_df = pd.read_csv('raw_results_v76.csv')
         dqn_data = raw_df[raw_df['Policy'] == 'Proposed DQN-Edge']; sp_data = raw_df[raw_df['Policy'] == 'Strict Priority']
         stats_results = []
         for metric, name in METRICS_FOR_STATS.items():
