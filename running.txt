@@ -1,8 +1,26 @@
-heisenberg@heisenberg:~/ns3-workspace/rl-agent$ sudo apt install python3.10 python3.10-venv -y
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
-python3.10 is already the newest version (3.10.20-1+noble1).
-python3.10-venv is already the newest version (3.10.20-1+noble1).
-0 upgraded, 0 newly installed, 0 to remove and 116 not upgraded.
-heisenberg@heisenberg:~/ns3-workspace/rl-agent$ 
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent$ pip install pandas numpy torch tqdm seaborn matplotlib ns3gym openpyxl
+Collecting pandas
+  Downloading pandas-2.3.3-cp310-cp310-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (12.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.8/12.8 MB 7.0 MB/s eta 0:00:00
+Collecting numpy
+  Downloading numpy-2.2.6-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (16.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.8/16.8 MB 7.4 MB/s eta 0:00:00
+Collecting torch
+  Downloading torch-2.13.0-cp310-cp310-manylinux_2_28_x86_64.whl (526.6 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 526.6/526.6 MB 1.1 MB/s eta 0:00:00
+Collecting tqdm
+  Downloading tqdm-4.70.0-py3-none-any.whl (80 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 80.2/80.2 kB 93.1 kB/s eta 0:00:00
+Collecting seaborn
+  Downloading seaborn-0.13.2-py3-none-any.whl (294 kB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 294.9/294.9 kB 1.5 MB/s eta 0:00:00
+Collecting matplotlib
+  Downloading matplotlib-3.10.9-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (8.8 MB)
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.8/8.8 MB 4.7 MB/s eta 0:00:00
+ERROR: Ignored the following versions that require a different python version: 2.3.0 Requires-Python >=3.11; 2.3.1 Requires-Python >=3.11; 2.3.2 Requires-Python >=3.11; 2.3.3 Requires-Python >=3.11; 2.3.4 Requires-Python >=3.11; 2.3.5 Requires-Python >=3.11; 2.4.0 Requires-Python >=3.11; 2.4.0rc1 Requires-Python >=3.11; 2.4.1 Requires-Python >=3.11; 2.4.2 Requires-Python >=3.11; 2.4.3 Requires-Python >=3.11; 2.4.4 Requires-Python >=3.11; 2.4.5 Requires-Python >=3.11; 2.4.6 Requires-Python >=3.11; 2.5.0 Requires-Python >=3.12; 2.5.0rc1 Requires-Python >=3.12; 2.5.1 Requires-Python >=3.12; 3.0.0 Requires-Python >=3.11; 3.0.0rc0 Requires-Python >=3.11; 3.0.0rc1 Requires-Python >=3.11; 3.0.0rc2 Requires-Python >=3.11; 3.0.1 Requires-Python >=3.11; 3.0.2 Requires-Python >=3.11; 3.0.3 Requires-Python >=3.11; 3.0.4 Requires-Python >=3.11; 3.0.5 Requires-Python >=3.11; 3.11.0 Requires-Python >=3.11; 3.11.0rc1 Requires-Python >=3.11; 3.11.0rc2 Requires-Python >=3.11; 3.11.1 Requires-Python >=3.11
+ERROR: Could not find a version that satisfies the requirement ns3gym (from versions: none)
+ERROR: No matching distribution found for ns3gym
+
+[notice] A new release of pip is available: 23.0.1 -> 26.2.1
+[notice] To update, run: pip install --upgrade pip
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent$ 
