@@ -1,1 +1,33 @@
-I found two different virtual environments (/ns3-workspace/rl-venv and /ns3-workspace/rl-agent/rl-venv), so I’m going to query both directly to confirm which one fails and why ns3gym cannot be resolved from PyPI.
+heisenberg@heisenberg:~/ns3-workspace$  cd /home/heisenberg/ns3-workspace/rl-agent && source rl-venv/bin/activate && python training/run_final_pipeline.py
+🛠️ V74: Rebuilding NS-3...
+✅ Build OK.
+
+🧠 V74: Training Final DQN...
+
+--- Epoch 1/50 (Seed: 12345) ---
+Gym has been unmaintained since 2022 and does not support NumPy 2.0 amongst other critical functionality.
+Please upgrade to Gymnasium, the maintained drop-in replacement of Gym, or contact the authors of your software and request that they upgrade.
+Users of this version of Gym should be able to simply replace 'import gym' with 'import gymnasium as gym' in the vast majority of cases.
+See the migration guide at https://gymnasium.farama.org/introduction/migration_guide/ for additional information.
+Waiting for simulation script to connect on port: tcp://localhost:5555
+Please start proper ns-3 simulation script using ./waf --run "..."
+Traceback (most recent call last):
+  File "/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py", line 491, in <module>
+    main_experiment()
+  File "/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py", line 252, in main_experiment
+    _, training_agent = run_simulation("DQN", TRAIN_STEPS_PER_EPOCH, True, epoch + 1, agent=training_agent, seed=epoch_seed, collect_data=(epoch == 0))
+  File "/home/heisenberg/ns3-workspace/rl-agent/training/run_final_pipeline.py", line 156, in run_simulation
+    env = ns3env.Ns3Env(port=PORT, startSim=False)
+  File "/home/heisenberg/ns3-workspace/rl-agent/rl-venv/lib/python3.10/site-packages/ns3gym/ns3env.py", line 396, in __init__
+    self.ns3ZmqBridge.initialize_env(self.stepTime)
+  File "/home/heisenberg/ns3-workspace/rl-agent/rl-venv/lib/python3.10/site-packages/ns3gym/ns3env.py", line 158, in initialize_env
+    self._observation_space = self._create_space(simInitMsg.obsSpace)
+  File "/home/heisenberg/ns3-workspace/rl-agent/rl-venv/lib/python3.10/site-packages/ns3gym/ns3env.py", line 121, in _create_space
+    mtype = np.float
+  File "/home/heisenberg/ns3-workspace/rl-agent/rl-venv/lib/python3.10/site-packages/numpy/__init__.py", line 305, in __getattr__
+    raise AttributeError(__former_attrs__[attr])
+AttributeError: module 'numpy' has no attribute 'float'.
+`np.float` was a deprecated alias for the builtin `float`. To avoid this error in existing code, use `float` by itself. Doing this will not modify any behavior and is safe. If you specifically wanted the numpy scalar type, use `np.float64` here.
+The aliases was originally deprecated in NumPy 1.20; for more details and guidance see the original release note at:
+    https://numpy.org/devdocs/release/1.20.0-notes.html#deprecations. Did you mean: 'cfloat'?
+(rl-venv) heisenberg@heisenberg:~/ns3-workspace/rl-agent$ 
